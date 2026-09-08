@@ -1,4 +1,4 @@
-// Общие
+/* Общие */
 * {
     box-sizing: border-box;
     margin: 0;
@@ -64,7 +64,7 @@ tr:hover {
     background-color: #f9f9f9;
 }
 
-// Кнопки и ссылки-кнопки
+/* Кнопки и ссылки-кнопки */
 .btn-add, .btn-cancel, .details, .edit {
     display: inline-block;
     padding: 6px 12px;
@@ -72,24 +72,33 @@ tr:hover {
     border-radius: 4px;
     color: white !important;
     text-decoration: none;
-    font-size: 0.8rem;
+    font-size: 0.9rem;
+    font-weight: 500;
     margin-right: 5px;
+    cursor: pointer;
+    text-align: center;
 }
 
-.btn-add { background-color: #007bff !important; }
-.btn-cancel { background-color: #6c757d !important; }
+.btn-add {
+    background-color: #007bff !important;
+}
 
+.btn-cancel {
+    background-color: #6c757d !important;
+}
 
 a.details {
-    background-color: #28a745 !important;  /* зелёный */
+    background-color: #28a745 !important;
 }
+
 a.edit {
-    background-color: #007bff !important;   /* синий */
+    background-color: #007bff !important;
 }
 
 button.details {
     background-color: #28a745 !important;
 }
+
 button.edit {
     background-color: #007bff !important;
 }
@@ -103,7 +112,7 @@ button.delete {
     cursor: pointer;
 }
 
-// Форма
+/* Форма */
 #form-page {
     max-width: 600px;
     margin: 0 auto;
@@ -154,7 +163,7 @@ button.delete {
     font-size: 0.9rem;
 }
 
-// Досье
+/* Досье */
 #profile-content {
     background: #f9f9f9;
     padding: 15px;
@@ -171,26 +180,30 @@ button.delete {
     width: 150px;
 }
 
-// Адаптивность
+/* Адаптивность */
 @media (max-width: 768px) {
     table, thead, tbody, th, td, tr {
         display: block;
     }
+
     thead {
         display: none;
     }
+
     tr {
         border: 1px solid #ddd;
         margin-bottom: 10px;
         border-radius: 4px;
         padding: 10px;
     }
+
     td {
         border: none;
         padding: 5px 0;
         position: relative;
         padding-left: 50%;
     }
+
     td:before {
         content: attr(data-label);
         position: absolute;
@@ -199,12 +212,14 @@ button.delete {
         font-weight: bold;
         white-space: nowrap;
     }
+
     td:last-child {
         padding-left: 0;
         display: flex;
         flex-wrap: wrap;
         gap: 5px;
     }
+
     td:last-child:before {
         display: none;
     }
@@ -212,7 +227,9 @@ button.delete {
     .form-actions {
         flex-direction: column;
     }
+
     .form-actions button {
         width: 100%;
     }
 }
+
