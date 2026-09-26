@@ -1,0 +1,24 @@
+[
+  {
+    "id": "3f15ed75-217b-47aa-8773-18266a3c91ff",
+    "fullName": "Водовозова Виктория Владиленовна",
+    "group": "P32212",
+    "isuId": "436563",
+    "dormitory": 322222222224,
+    "room": 38778,
+    "moveInDate": "2000-04-24",
+    "isForeigner": true,
+    "notes": "2"
+  },
+  {
+    "id": "c4ce61c0-187b-4cf1-8bdc-31179aef1557",
+    "fullName": "Ваh",
+    "group": "P32212",
+    "isuId": "436565",
+    "dormitory": 1,
+    "room": 1,
+    "moveInDate": "2007-08-25",
+    "isForeigner": true,
+    "notes": ""
+  }
+]
