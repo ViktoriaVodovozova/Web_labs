@@ -8,7 +8,12 @@ vi.mock('../src/services/httpClient', () => ({ api: vi.fn(), request: vi.fn() })
 describe('API профиля', () => {
   it('возвращает профиль и передаёт сигнал отмены HTTP-клиенту', async () => {
     // Arrange
-    const profile = { id: 'user-1', username: 'reader', email: 'reader@example.com', role: 'USER' };
+    const profile = {
+      id: 'user-1',
+      username: 'reader',
+      email: 'reader@example.com',
+      role: 'USER',
+    };
     const controller = new AbortController();
     api.mockResolvedValue({ data: profile });
 

@@ -4,7 +4,8 @@ import { getSessionGeneration, setSession } from './session';
 async function authenticate(kind, values) {
   const generation = getSessionGeneration();
   const { data } = await request(`/auth/${kind}`, {
-    method: 'POST', body: JSON.stringify(values),
+    method: 'POST',
+    body: JSON.stringify(values),
   });
   if (generation === getSessionGeneration()) setSession(data);
   return data;

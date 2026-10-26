@@ -15,9 +15,12 @@ describe('Компоненты списка студентов', () => {
     const onChange = vi.fn();
     const query = {
       ...Object.fromEntries(filterFields.map(([name]) => [name, ''])),
-      search: '', isForeigner: '', sortBy: 'fullName', direction: 'asc',
+      search: '',
+      isForeigner: '',
+      sortBy: 'fullName',
+      direction: 'asc',
     };
-    render(<StudentFilters query={query} onChange={onChange} onReset={vi.fn()}/>);
+    render(<StudentFilters query={query} onChange={onChange} onReset={vi.fn()} />);
     const user = userEvent.setup();
 
     // Act: пользователь открывает фильтры и выбирает значение по подписи поля.
@@ -31,8 +34,16 @@ describe('Компоненты списка студентов', () => {
   it('на первой странице запрещает переход назад и позволяет перейти вперёд', async () => {
     // Arrange
     const onPageChange = vi.fn();
-    render(<StudentPagination page={0} size={10} pages={2} loading={false}
-      onPageChange={onPageChange} onSizeChange={vi.fn()}/>);
+    render(
+      <StudentPagination
+        page={0}
+        size={10}
+        pages={2}
+        loading={false}
+        onPageChange={onPageChange}
+        onSizeChange={vi.fn()}
+      />
+    );
     const user = userEvent.setup();
 
     // Act
@@ -46,15 +57,27 @@ describe('Компоненты списка студентов', () => {
   it('показывает данные студента без кнопок изменения для USER', () => {
     // Arrange
     const student = {
-      id: 'student-1', fullName: 'Иван Петров', group: 'P3121', isuId: '012345',
-      dormitory: 2, room: 317, moveInDate: '2024-09-01', isForeigner: false,
+      id: 'student-1',
+      fullName: 'Иван Петров',
+      group: 'P3121',
+      isuId: '012345',
+      dormitory: 2,
+      room: 317,
+      moveInDate: '2024-09-01',
+      isForeigner: false,
     };
 
     // Act
-    render(<MemoryRouter><StudentTable students={[student]} isAdmin={false}/></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <StudentTable students={[student]} isAdmin={false} />
+      </MemoryRouter>
+    );
 
     // Assert
-    expect(screen.getByRole('link', { name: 'Иван Петров' }).getAttribute('href')).toBe('/students/student-1');
+    expect(
+      screen.getByRole('link', { name: 'Иван Петров' }).getAttribute('href')
+    ).toBe('/students/student-1');
     expect(screen.getByText('012345')).toBeTruthy();
     expect(screen.queryByRole('link', { name: 'Изменить' })).toBeNull();
     expect(screen.queryByRole('button', { name: /Удалить/ })).toBeNull();
