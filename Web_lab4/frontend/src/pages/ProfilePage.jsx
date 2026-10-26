@@ -13,7 +13,7 @@ export default function ProfilePage() {
     authApi.getProfile(controller.signal).then(setProfile).catch(error => { if (error.name !== 'AbortError') setError(error); });
     return () => controller.abort();
   }, [retry]);
-  return <section className="card narrow"><span className="eyebrow">АККАУНТ</span><h1>Мой профиль</h1><ErrorMessage error={error} retry={() => setRetry(x => x + 1)}/>
-    {!profile && !error && <Loading/>}{profile && <><div className="avatar">{profile.username[0].toUpperCase()}</div><dl className="details"><dt>Имя пользователя</dt><dd>{profile.username}</dd><dt>Email</dt><dd>{profile.email}</dd><dt>Роль</dt><dd>{profile.role === 'ADMIN' ? 'Администратор — просмотр и изменение записей' : 'Пользователь — только просмотр'}</dd><dt>ID</dt><dd className="mono">{profile.id}</dd></dl><button onClick={logout}>Выйти из системы</button></>}
+  return <section className="card narrow"><h1>Мой профиль</h1><ErrorMessage error={error} retry={() => setRetry(x => x + 1)}/>
+    {!profile && !error && <Loading/>}{profile && <><dl className="details"><dt>Имя пользователя</dt><dd>{profile.username}</dd><dt>Email</dt><dd>{profile.email}</dd><dt>Роль</dt><dd>{profile.role === 'ADMIN' ? 'Администратор — просмотр и изменение записей' : 'Пользователь — только просмотр'}</dd><dt>ID</dt><dd className="mono">{profile.id}</dd></dl><button onClick={logout}>Выйти из системы</button></>}
   </section>;
 }

@@ -21,7 +21,7 @@ describe('Компоненты списка студентов', () => {
     const user = userEvent.setup();
 
     // Act: пользователь открывает фильтры и выбирает значение по подписи поля.
-    await user.click(screen.getByText('Фильтры по всем полям'));
+    await user.click(screen.getByText('Другие фильтры'));
     await user.selectOptions(screen.getByLabelText('Иностранец'), 'true');
 
     // Assert

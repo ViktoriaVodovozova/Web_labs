@@ -43,32 +43,18 @@ export default function StudentsPage() {
     }
   }, [state.loading, state.error, state.pages, query.page]);
 
-  return <>
-    <div className="page-heading">
-      <div>
-        <span className="eyebrow">СТУДЕНЧЕСКИЙ УЧЁТ</span>
-        <h1>Студенты <span className="count">{state.total}</span></h1>
-        <p className="muted">Информация о студентах и заселении в общежития.</p>
-      </div>
-      {isAdmin && <Link className="button primary" to="/students/new">+ Добавить студента</Link>}
-    </div>
+  return <section className="card" aria-busy={state.loading} aria-label="Список студентов">
     <StudentFilters query={query} onChange={change}
-      onReset={() => setParams({}, { replace: true })}/>
+      onReset={() => setParams({}, { replace: true })}>
+      {isAdmin && <Link className="button btn-add" to="/students/new">Добавить студента</Link>}
+    </StudentFilters>
     <ErrorMessage error={state.error} retry={changed}/>
-    <section className="card list-card" aria-busy={state.loading} aria-label="Список студентов">
-      <div className="list-top">
-        <strong>Список студентов</strong>
-        <span className="muted" role="status">{state.loading ? 'Обновление…' : `Найдено: ${state.total}`}</span>
-      </div>
-      {state.loading && <Loading text="Загрузка студентов…"/>}
-      {!state.loading && !state.error && (state.data.length > 0
-        ? <StudentTable students={state.data} isAdmin={isAdmin}/>
-        : <div className="empty"><h2>Студенты не найдены</h2>
-            <p>Измените фильтры{isAdmin ? ' или добавьте первую запись' : ''}.</p>
-          </div>)}
-      <StudentPagination page={query.page} size={query.size} pages={state.pages} loading={state.loading}
-        onPageChange={page => change('page', String(page), false)}
-        onSizeChange={size => change('size', size)}/>
-    </section>
-  </>;
+    {state.loading && <Loading/>}
+    {!state.loading && !state.error && (state.data.length > 0
+      ? <StudentTable students={state.data} isAdmin={isAdmin}/>
+      : <p className="empty">Студенты не найдены.</p>)}
+    <StudentPagination page={query.page} size={query.size} pages={state.pages} loading={state.loading}
+      onPageChange={page => change('page', String(page), false)}
+      onSizeChange={size => change('size', size)}/>
+  </section>;
 }

@@ -22,13 +22,13 @@ export function Field({ name, label, error, children }) {
   </div>;
 }
 export function Layout() {
-  const { session, logout, undo, undoBusy, mutationBusy, undoDelete, isAdmin, notice, setNotice } = useApp();
-  return <><header className="site-header"><div className="header-inner">
-    <Link to="/students" className="brand"><span className="brand-icon">С</span><span>Студенты<small>Управление заселением</small></span></Link>
+  const { session, logout, undo, undoSeconds, undoBusy, mutationBusy, undoDelete, isAdmin, notice, setNotice } = useApp();
+  return <><header>
+    <h1>Управление студентами</h1>
     <nav aria-label="Основная навигация">{session ? <><Link to="/students">Студенты</Link><Link to="/profile">{session.username} <span className="badge">{isAdmin ? 'ADMIN' : 'USER'}</span></Link><button className="ghost" onClick={logout}>Выйти</button></> : <><Link to="/login">Вход</Link><Link to="/register">Регистрация</Link></>}</nav>
-  </div></header><main>
+  </header><main>
     {notice && <div className={`alert ${notice.error ? 'error' : 'success'}`} role="status">{notice.text}<button className="ghost" onClick={() => setNotice(null)} aria-label="Скрыть уведомление">×</button></div>}
-    {isAdmin && undo.length > 0 && <div className="alert undo" role="status"><span>Удалён студент «{undo.at(-1).fullName}». {undo.length > 1 && `В истории: ${undo.length}.`}</span><button disabled={mutationBusy} onClick={undoDelete}>{undoBusy ? 'Восстановление…' : 'Отменить удаление'}</button></div>}
+    {isAdmin && undo.length > 0 && <div className="alert undo" role="status"><span>Удалён студент «{undo.at(-1).fullName}».</span><button disabled={mutationBusy} onClick={undoDelete}>{undoBusy ? 'Восстановление…' : `Отменить удаление · ${undoSeconds}`}</button></div>}
     <Outlet/>
-  </main><footer>Система управления студентами · Лабораторная работа №4 · React + RxJS</footer></>;
+  </main></>;
 }
