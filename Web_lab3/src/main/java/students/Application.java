@@ -6,6 +6,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
+import students.entity.User;
+import students.repository.UserRepository;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
 
 @SpringBootApplication
