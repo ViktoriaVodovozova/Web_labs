@@ -23,7 +23,6 @@ export function useStudents(query, revision) {
     return () => subscription.unsubscribe();
   }, []);
   useEffect(() => {
-    // revision makes a successful mutation or Retry refresh the same query.
     stream.current.next({ ...query, revision });
   }, [query, revision]);
   return state;

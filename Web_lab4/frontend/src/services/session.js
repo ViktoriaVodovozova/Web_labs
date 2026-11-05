@@ -19,7 +19,6 @@ export function setSession(value) {
     if (value) sessionStorage.setItem(KEY, JSON.stringify(value));
     else sessionStorage.removeItem(KEY);
   } catch {
-    /* The current tab can still work with an in-memory session. */
   }
   session$.next(value);
 }
@@ -28,12 +27,10 @@ export function getSessionGeneration() {
   return generation;
 }
 
-// A refresh changes tokens, while the user session itself stays the same.
 export function updateTokens(value) {
   try {
     sessionStorage.setItem(KEY, JSON.stringify(value));
   } catch {
-    /* memory fallback */
   }
   session$.next(value);
 }

@@ -10,10 +10,9 @@ body {
     BlinkMacSystemFont,
     'Segoe UI',
     Roboto,
-    Times New Roman,
     sans-serif;
-  background: #f0f2f5;
-  color: #1f2937;
+  background: #f3f6fa;
+  color: #29364a;
   padding: 30px 20px;
   line-height: 1.5;
 }
@@ -25,13 +24,13 @@ header {
 
 h1 {
   font-size: 2rem;
-  color: #111827;
+  color: #1e2d43;
   font-weight: 700;
 }
 
 h2 {
   font-size: 1.4rem;
-  color: #111827;
+  color: #1e2d43;
   margin-bottom: 20px;
   font-weight: 600;
 }
@@ -62,12 +61,12 @@ main {
   align-items: center;
   margin-bottom: 20px;
   padding-bottom: 20px;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid #e1e7ef;
 }
 
 .toolbar input {
   padding: 9px 12px;
-  border: 1px solid #d1d5db;
+  border: 1px solid #ccd6e3;
   border-radius: 8px;
   font-size: 0.95rem;
   width: 180px;
@@ -76,8 +75,8 @@ main {
 
 .toolbar input:focus {
   outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+  border-color: #4361a6;
+  box-shadow: 0 0 0 3px rgba(67, 97, 166, 0.14);
 }
 
 /* тянем кнопку «Добавить» вправо */
@@ -89,7 +88,7 @@ main {
 .table-wrapper {
   overflow-x: auto;
   border-radius: 10px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid #e1e7ef;
 }
 
 table {
@@ -102,14 +101,14 @@ th,
 td {
   padding: 12px 14px;
   text-align: left;
-  border-bottom: 1px solid #f3f4f6;
+  border-bottom: 1px solid #edf1f6;
   vertical-align: middle;
 }
 
 th {
-  background: #f9fafb;
+  background: #f6f8fc;
   font-weight: 600;
-  color: #374151;
+  color: #44546c;
   font-size: 0.82rem;
   text-transform: uppercase;
   letter-spacing: 0.03em;
@@ -120,7 +119,7 @@ tbody tr:last-child td {
   border-bottom: none;
 }
 tbody tr:hover {
-  background: #f9fafb;
+  background: #f6f8fc;
 }
 
 /* === кнопки === */
@@ -169,23 +168,23 @@ button.delete:hover {
 }
 
 .btn-add {
-  background-color: #ec4899 !important;
-} /* розовая — Добавить */
+  background-color: #4361a6 !important;
+} 
 .btn-filter {
-  background-color: #6b7280 !important;
-} /* серая  — Найти */
+  background-color: #64748b !important;
+} 
 .btn-cancel {
-  background-color: #6b7280 !important;
-} /* серая  — Отмена/Назад */
+  background-color: #64748b !important;
+} 
 .details-button {
-  background-color: #22c55e !important;
-} /* зелёная — Подробнее */
+  background-color: #526b91 !important;
+} 
 .edit {
-  background-color: #3b82f6 !important;
-} /* синяя — Редактировать */
+  background-color: #4361a6 !important;
+} 
 button.delete {
-  background-color: #ef4444 !important;
-} /* красная — Удалить */
+  background-color: #b9404d !important;
+} 
 /* === форма === */
 #form-page {
   max-width: 640px;
@@ -202,13 +201,13 @@ button.delete {
   font-weight: 600;
   margin-bottom: 6px;
   font-size: 0.9rem;
-  color: #374151;
+  color: #44546c;
 }
 
 .form-group input,
 .form-group textarea {
   padding: 11px 14px;
-  border: 1px solid #d1d5db;
+  border: 1px solid #ccd6e3;
   border-radius: 8px;
   font-size: 1rem;
   font-family: inherit;
@@ -221,8 +220,8 @@ button.delete {
 .form-group input:focus,
 .form-group textarea:focus {
   outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+  border-color: #4361a6;
+  box-shadow: 0 0 0 3px rgba(67, 97, 166, 0.14);
 }
 
 .form-group.checkbox {
@@ -240,11 +239,11 @@ button.delete {
   width: 18px;
   height: 18px;
   cursor: pointer;
-  accent-color: #3b82f6;
+  accent-color: #4361a6;
 }
 
 .required {
-  color: #ef4444;
+  color: #b9404d;
   margin-left: 2px;
 }
 
@@ -253,13 +252,13 @@ button.delete {
   gap: 10px;
   margin-top: 20px;
   padding-top: 20px;
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid #e1e7ef;
 }
 
 .errors {
-  color: #ef4444;
-  background: #fef2f2;
-  border: 1px solid #fecaca;
+  color: #b9404d;
+  background: #fff3f4;
+  border: 1px solid #f0c9ce;
   border-radius: 8px;
   padding: 12px 14px;
   margin-top: 15px;
@@ -272,16 +271,16 @@ button.delete {
 
 /* === досье === */
 #profile-content {
-  background: #f9fafb;
+  background: #f6f8fc;
   padding: 20px 24px;
   border-radius: 10px;
   margin-bottom: 20px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid #e1e7ef;
 }
 
 .profile-item {
   padding: 10px 0;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid #e1e7ef;
   font-size: 0.95rem;
 }
 
@@ -292,7 +291,7 @@ button.delete {
 .profile-item strong {
   display: inline-block;
   width: 180px;
-  color: #4b5563;
+  color: #596b82;
   font-weight: 600;
 }
 
@@ -332,7 +331,7 @@ button.delete {
   }
 
   tr {
-    border: 1px solid #e5e7eb;
+    border: 1px solid #e1e7ef;
     margin-bottom: 12px;
     border-radius: 10px;
     padding: 12px;
@@ -351,7 +350,7 @@ button.delete {
     top: 6px;
     width: 40%;
     font-weight: 600;
-    color: #6b7280;
+    color: #64748b;
     font-size: 0.8rem;
   }
   td:last-child {
@@ -394,7 +393,7 @@ button.delete {
 select {
   padding: 8px;
   border-radius: 6px;
-  border: 1px solid #ccc;
+  border: 1px solid #ccd6e3;
 }
 .pagination {
   display: flex;
@@ -409,7 +408,7 @@ button:disabled {
 
 /* Общие компоненты React. */
 a {
-  color: #2563eb;
+  color: #35548e;
 }
 button,
 input,
@@ -423,10 +422,10 @@ button,
   align-items: center;
   justify-content: center;
   padding: 8px 12px;
-  border: 1px solid #d1d5db;
+  border: 1px solid #ccd6e3;
   border-radius: 6px;
   background: #fff;
-  color: #1f2937;
+  color: #29364a;
   cursor: pointer;
   text-decoration: none;
 }
@@ -435,14 +434,14 @@ button:disabled {
 }
 button.primary,
 .button.primary {
-  background: #3b82f6;
+  background: #4361a6;
   color: #fff;
-  border-color: #3b82f6;
+  border-color: #4361a6;
 }
 button.danger {
-  background: #ef4444;
+  background: #b9404d;
   color: #fff;
-  border-color: #ef4444;
+  border-color: #b9404d;
 }
 nav {
   display: flex;
@@ -483,7 +482,7 @@ nav {
 .field textarea {
   width: 100%;
   padding: 11px 14px;
-  border: 1px solid #d1d5db;
+  border: 1px solid #ccd6e3;
   border-radius: 8px;
   background: #fff;
 }
@@ -498,19 +497,19 @@ nav {
 }
 .field-error {
   display: block;
-  color: #dc2626;
+  color: #ac3443;
   margin-top: 4px;
 }
 input[aria-invalid='true'],
 textarea[aria-invalid='true'] {
-  border-color: #dc2626;
+  border-color: #ac3443;
 }
 input:focus-visible,
 textarea:focus-visible,
 select:focus-visible,
 button:focus-visible,
 a:focus-visible {
-  outline: 2px solid #3b82f6;
+  outline: 2px solid #4361a6;
   outline-offset: 2px;
 }
 fieldset {
@@ -522,7 +521,7 @@ textarea {
 }
 .alert {
   padding: 12px 14px;
-  border: 1px solid #d1d5db;
+  border: 1px solid #ccd6e3;
   border-radius: 8px;
   margin-bottom: 16px;
   overflow-wrap: anywhere;
@@ -531,17 +530,17 @@ textarea {
   margin-left: 10px;
 }
 .alert.error {
-  color: #dc2626;
-  background: #fef2f2;
-  border-color: #fecaca;
+  color: #ac3443;
+  background: #fff3f4;
+  border-color: #f0c9ce;
 }
 .alert ul {
   padding-left: 20px;
 }
 .alert.success,
 .alert.undo {
-  background: #f0fdf4;
-  border-color: #bbf7d0;
+  background: #eff7f3;
+  border-color: #c6dfd3;
 }
 .toolbar select {
   max-width: 200px;
@@ -558,7 +557,7 @@ textarea {
 }
 .table-scroll {
   overflow-x: auto;
-  border: 1px solid #e5e7eb;
+  border: 1px solid #e1e7ef;
   border-radius: 10px;
 }
 .row-actions {
@@ -610,7 +609,7 @@ dl.details {
 }
 .muted,
 .hint {
-  color: #6b7280;
+  color: #64748b;
   font-size: 0.9rem;
 }
 .hint {
@@ -621,7 +620,7 @@ dl.details {
 }
 .badge {
   font-size: 0.8rem;
-  color: #6b7280;
+  color: #64748b;
 }
 @media (max-width: 768px) {
   .card {
@@ -635,4 +634,158 @@ dl.details {
   .pagination > div {
     flex-wrap: wrap;
   }
+}
+
+/* Единое оформление элементов приложения. */
+body {
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+header { padding-bottom: 8px; }
+h1, h2 { letter-spacing: -0.025em; }
+a { text-underline-offset: 3px; }
+a:hover { color: #263f72; }
+.page, .card {
+  border: 1px solid #e1e7ef;
+  border-radius: 16px;
+  box-shadow: 0 8px 28px rgba(30, 45, 67, 0.045);
+}
+button, .button {
+  min-height: 38px;
+  gap: 6px;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: background-color 150ms, border-color 150ms, color 150ms, box-shadow 150ms;
+}
+button:not(:disabled):hover, .button:hover {
+  background: #f0f3f8;
+  border-color: #afbed2;
+  color: #29364a;
+}
+button.primary:not(:disabled):hover, .button.primary:hover {
+  background: #35518e;
+  border-color: #35518e;
+  color: #fff;
+}
+.btn-add:hover { background-color: #35518e !important; }
+.btn-filter:hover, .btn-cancel:hover { background-color: #516177 !important; }
+.details-button, .edit {
+  background-color: #edf2fa !important;
+  border: 1px solid #d6e0ef;
+  color: #35548e !important;
+  box-shadow: none;
+}
+.details-button:hover, .edit:hover {
+  background-color: #dfe8f6 !important;
+  border-color: #b7c8e2;
+  box-shadow: none;
+}
+button.danger, button.delete {
+  background: #fff3f4;
+  background-color: #fff3f4 !important;
+  border: 1px solid #edc8ce;
+  color: #ac3443 !important;
+}
+button.danger:not(:disabled):hover, button.delete:not(:disabled):hover {
+  background: #fbe3e7;
+  background-color: #fbe3e7 !important;
+  border-color: #dda5af;
+  color: #962b39;
+}
+button:disabled, fieldset:disabled input, fieldset:disabled textarea {
+  cursor: not-allowed;
+}
+button:disabled:hover {
+  transform: none;
+  box-shadow: none;
+}
+nav {
+  gap: 8px;
+  padding: 8px 0;
+}
+nav a {
+  padding: 7px 10px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 500;
+}
+nav a:hover { background: #e7edf6; }
+nav .ghost { margin-left: auto; }
+.badge {
+  display: inline-block;
+  padding: 2px 7px;
+  margin-left: 4px;
+  border-radius: 6px;
+  background: #e7edf6;
+  color: #445d82;
+  font-size: 0.7rem;
+  font-weight: 600;
+  vertical-align: middle;
+}
+input, select, textarea { color: #29364a; }
+input::placeholder, textarea::placeholder { color: #68788e; }
+select {
+  min-height: 40px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: #fff;
+}
+.toolbar input { min-height: 40px; }
+.field input, .field textarea {
+  font: inherit;
+  transition: border-color 150ms, box-shadow 150ms;
+}
+.field input[type='checkbox'] { accent-color: #4361a6; }
+.field input:focus, .field textarea:focus, select:focus {
+  border-color: #4361a6;
+  box-shadow: 0 0 0 3px rgba(67, 97, 166, 0.12);
+}
+input[aria-invalid='true'], textarea[aria-invalid='true'] { border-color: #ac3443; }
+th { background: #eef2f8; color: #4c607d; }
+tbody tr { transition: background-color 150ms; }
+tbody tr:hover { background: #f5f8fd; }
+td { overflow-wrap: anywhere; }
+.extra-filters summary { color: #526782; font-weight: 500; }
+.alert.undo { background: #edf2fa; border-color: #d1ddf0; color: #35548e; }
+.alert.success { color: #28634d; }
+.pagination { padding-top: 18px; border-top: 1px solid #e1e7ef; }
+.pagination span { color: #596b82; font-size: 0.9rem; }
+.auth-layout { margin-top: 32px; }
+.full { width: 100%; }
+.form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 18px; }
+.span-all { grid-column: 1 / -1; }
+.empty { text-align: center; color: #64748b; padding: 32px 0; }
+.loading { display: flex; align-items: center; gap: 10px; color: #64748b; }
+.spinner {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border: 2px solid #dbe3ef;
+  border-top-color: #4361a6;
+  border-radius: 50%;
+  animation: spin 800ms linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+@media (max-width: 768px) {
+  .form-grid { grid-template-columns: minmax(0, 1fr); }
+  .page, .card { border-radius: 12px; }
+  .toolbar input, .toolbar select { min-width: 0; }
+  .pagination > div { gap: 8px; }
+  .alert button { margin: 8px 0 0; }
+  td { min-height: 30px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; }
+  .spinner { animation: none; }
+  .btn-add:hover, .btn-cancel:hover, .btn-filter:hover,
+  .details-button:hover, .edit:hover, button.delete:hover { transform: none; }
+}
+
+/* ИСУ ID всегда отображается целиком, без переноса цифр. */
+.table-scroll td[data-label='ИСУ ID'],
+.table-wrapper td[data-label='ИСУ ID'] {
+  white-space: nowrap;
+  overflow-wrap: normal;
+  word-break: normal;
+  font-variant-numeric: tabular-nums;
 }

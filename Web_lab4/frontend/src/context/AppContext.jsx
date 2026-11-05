@@ -51,7 +51,6 @@ export function AppProvider({ children }) {
     try {
       sessionStorage.setItem(undoKey(session?.username), JSON.stringify(value));
     } catch {
-      /* usable in memory */
     }
   }
   function changed() {
