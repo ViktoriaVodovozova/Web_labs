@@ -1,16 +1,25 @@
 {
-  "name": "frontend",
-  "version": "0.1.0",
+  "name": "students-react",
+  "version": "1.0.0",
   "private": true,
+  "type": "module",
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start"
+    "dev": "vite --host 0.0.0.0",
+    "build": "vite build",
+    "preview": "vite preview --host 0.0.0.0",
+    "test": "vitest run"
   },
   "dependencies": {
-    "js-cookie": "^3.0.5",
-    "next": "16.4.5",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
+    "react-router-dom": "7.9.4",
+    "rxjs": "7.8.2"
+  },
+  "devDependencies": {
+    "vite": "7.1.12",
+    "vitest": "3.2.4",
+    "jsdom": "26.1.0",
+    "@testing-library/react": "16.3.0",
+    "@testing-library/user-event": "14.6.1"
   }
 }
