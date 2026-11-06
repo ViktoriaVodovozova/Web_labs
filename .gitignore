@@ -1,6 +1,7 @@
+node_modules/
+.next/
+target/
+*.zip
 .DS_Store
-venv/
 .idea/
-*.iml
-*.pyc
 __pycache__/
