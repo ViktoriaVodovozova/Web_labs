@@ -4,7 +4,7 @@ export async function POST(request) {
   try {
     const body = await request.json();
 
-    const res = await fetch('http://localhost:8000/api/auth/login', {
+    const res = await fetch(`${process.env.API_BASE_URL || 'http://localhost:8000'}/api/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
@@ -20,20 +20,19 @@ export async function POST(request) {
 
     response.cookies.set('accessToken', data.accessToken, {
       httpOnly: true,
+      sameSite: 'lax',
       maxAge: data.expiresIn,
       path: '/',
     });
 
     response.cookies.set('refreshToken', data.refreshToken, {
       httpOnly: true,
+      sameSite: 'lax',
       maxAge: 60 * 60 * 24 * 7,
       path: '/',
     });
 
-    response.cookies.set('role', data.role, {
-      maxAge: 60 * 60 * 24 * 7,
-      path: '/',
-    });
+    
 
     return response;
   } catch (error) {

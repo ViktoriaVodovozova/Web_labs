@@ -22,3 +22,7 @@ th { background: #f6f8fc; font-size: 0.82rem; text-transform: uppercase; }
 .auth-layout { max-width: 440px; margin: 32px auto; }
 .pagination { display: flex; gap: 12px; margin-top: 20px; padding-top: 18px; border-top: 1px solid #e1e7ef; }
 nav a { text-decoration: none; color: #35548e; font-weight: 500; margin-left: 15px; }
+.audit-history { margin-top: 24px; border-top: 1px solid #e1e7ef; padding-top: 16px; }
+.audit-history summary { cursor: pointer; font-weight: 600; color: #35548e; padding: 10px 0; }
+.audit-history[open] summary { margin-bottom: 12px; }
+.audit-muted { color: #69788e; padding: 12px 0; }

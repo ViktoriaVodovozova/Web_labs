@@ -1,7 +1,15 @@
+import { cookies } from 'next/headers';
+import { redirect } from 'next/navigation';
 import { createStudentAction } from '../actions';
 import Link from 'next/link';
 
-export default function NewStudentPage() {
+export default async function NewStudentPage() {
+  const store = await cookies();
+  const token = store.get('accessToken')?.value;
+  if (!token) redirect('/login');
+  const me = await fetch(`${process.env.API_BASE_URL || 'http://localhost:8000'}/api/auth/me`, {headers:{Authorization:`Bearer ${token}`},cache:'no-store'});
+  if (!me.ok || (await me.json()).role !== 'ADMIN') redirect('/students');
+
   return (
     <section className="card narrow">
       <h2>Добавить студента</h2>

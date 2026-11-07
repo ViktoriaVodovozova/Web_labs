@@ -2,7 +2,7 @@ import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 
 async function fetchProfile(token) {
-  const res = await fetch('http://localhost:8000/api/auth/me', {
+  const res = await fetch(`${process.env.API_BASE_URL || 'http://localhost:8000'}/api/auth/me`, {
     headers: { Authorization: `Bearer ${token}` },
     cache: 'no-store'
   });

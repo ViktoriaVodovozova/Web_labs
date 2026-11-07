@@ -1,14 +1,17 @@
 import { cookies } from 'next/headers';
+import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { updateStudentAction } from '../../actions';
 
 async function fetchStudent(id, token) {
-  const res = await fetch(`http://localhost:8000/api/requests/${id}`, { headers: { Authorization: `Bearer ${token}` }, cache: 'no-store' });
+  const res = await fetch(`${process.env.API_BASE_URL || 'http://localhost:8000'}/api/requests/${id}`, { headers: { Authorization: `Bearer ${token}` }, cache: 'no-store' });
   if (!res.ok) return null; return res.json();
 }
 
 export default async function EditStudentPage({ params }) {
   const cookieStore = await cookies(); const token = cookieStore.get('accessToken')?.value; const { id } = await params;
+  const me = await fetch(`${process.env.API_BASE_URL || 'http://localhost:8000'}/api/auth/me`, {headers:{Authorization:`Bearer ${token}`},cache:'no-store'});
+  if (!me.ok || (await me.json()).role !== 'ADMIN') redirect('/students');
   const student = await fetchStudent(id, token); if (!student) return <div className="alert error">Студент не найден</div>;
   const updateActionWithId = updateStudentAction.bind(null, id);
 

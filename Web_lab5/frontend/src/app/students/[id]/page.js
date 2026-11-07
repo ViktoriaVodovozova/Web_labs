@@ -1,10 +1,10 @@
 import { cookies } from 'next/headers';
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { deleteStudentAction } from '../actions';
 
 async function fetchStudent(id, token) {
-  const res = await fetch(`http://localhost:8000/api/requests/${id}`, {
+  const res = await fetch(`${process.env.API_BASE_URL || 'http://localhost:8000'}/api/requests/${id}`, {
     headers: { Authorization: `Bearer ${token}` },
     cache: 'no-store'
   });
@@ -16,8 +16,10 @@ async function fetchStudent(id, token) {
 export default async function StudentDetailPage({ params }) {
   const cookieStore = await cookies();
   const token = cookieStore.get('accessToken')?.value;
-  const role = cookieStore.get('role')?.value;
-  const isAdmin = role === 'ADMIN';
+  if (!token) redirect('/login');
+  const me = await fetch(`${process.env.API_BASE_URL || 'http://localhost:8000'}/api/auth/me`, {headers:{Authorization:`Bearer ${token}`},cache:'no-store'});
+  if (me.status === 401 || me.status === 403) redirect('/login');
+  const isAdmin = me.ok && (await me.json()).role === 'ADMIN';
 
   const { id } = await params;
   const student = await fetchStudent(id, token);

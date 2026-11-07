@@ -1,5 +1,6 @@
 import { cookies } from 'next/headers';
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
 import StudentFilters from './components/StudentFilters';
 
 async function fetchStudents(searchParams, token) {
@@ -7,9 +8,9 @@ async function fetchStudents(searchParams, token) {
   for (const [key, value] of Object.entries(searchParams)) { if (value) query.append(key, value); }
   if (!query.has('page')) query.append('page', '0'); if (!query.has('size')) query.append('size', '10');
 
-  const res = await fetch(`http://localhost:8000/api/requests?${query.toString()}`, {
+  const res = await fetch(`${process.env.API_BASE_URL || 'http://localhost:8000'}/api/requests?${query.toString()}`, {
     headers: { Authorization: `Bearer ${token}` },
-    next: { tags: ['students'] }
+    cache: 'no-store'
   });
 
   if (!res.ok) throw new Error('Ошибка загрузки');
@@ -25,8 +26,10 @@ async function fetchStudents(searchParams, token) {
 export default async function StudentsPage({ searchParams }) {
   const cookieStore = await cookies();
   const token = cookieStore.get('accessToken')?.value;
-  const role = cookieStore.get('role')?.value;
-  const isAdmin = role === 'ADMIN';
+  if (!token) redirect('/login');
+  const me = await fetch(`${process.env.API_BASE_URL || 'http://localhost:8000'}/api/auth/me`, {headers:{Authorization:`Bearer ${token}`},cache:'no-store'});
+  if (me.status === 401 || me.status === 403) redirect('/login');
+  const isAdmin = me.ok && (await me.json()).role === 'ADMIN';
 
   const params = await searchParams;
   let studentsData;
@@ -34,10 +37,23 @@ export default async function StudentsPage({ searchParams }) {
   try {
     studentsData = await fetchStudents(params, token);
     } catch (error) {
-    return <div className="alert error">Настоящая ошибка: {error.message}</div>;
+    return <div className="alert error">Не удалось загрузить студентов: {error.message}</div>;
   }
 
   const { data: students, total, totalPages, currentPage } = studentsData;
+  let auditEvents = [];
+  let auditUnavailable = false;
+  if (isAdmin) {
+    try {
+      const auditResponse = await fetch(`${process.env.API_BASE_URL || 'http://localhost:8000'}/api/audit`, {
+        headers: { Authorization: `Bearer ${token}` }, cache: 'no-store'
+      });
+      if (!auditResponse.ok) throw new Error(`HTTP ${auditResponse.status}`);
+      auditEvents = await auditResponse.json();
+    } catch {
+      auditUnavailable = true;
+    }
+  }
 
   const createPageLink = (newPage) => {
     const newParams = new URLSearchParams(params);
@@ -53,7 +69,7 @@ export default async function StudentsPage({ searchParams }) {
         {isAdmin && <Link href="/students/new" className="btn-add">Добавить студента</Link>}
       </div>
 
-      {/* ВОТ ОНИ, ФИЛЬТРЫ! */}
+      {/* Поиск и фильтры списка */}
       <StudentFilters />
 
       {students.length > 0 ? (
@@ -99,6 +115,29 @@ export default async function StudentsPage({ searchParams }) {
           )}
         </div>
       </div>
+      {isAdmin && (
+        <details className="audit-history">
+          <summary>История действий пользователей</summary>
+          {auditUnavailable ? <p className="audit-muted">Не удалось загрузить историю.</p> :
+            auditEvents.length === 0 ? <p className="audit-muted">Пока нет действий. Новые изменения появятся здесь.</p> : (
+              <div className="table-wrapper">
+                <table>
+                  <thead><tr><th>Дата и время</th><th>Пользователь</th><th>Действие</th><th>Студент</th></tr></thead>
+                  <tbody>
+                    {auditEvents.map(event => (
+                      <tr key={event.id}>
+                        <td>{new Date(event.occurredAt).toLocaleString('ru-RU', { timeZone: 'Europe/Moscow' })} МСК</td>
+                        <td>{event.username}</td>
+                        <td>{({ CREATE: 'Создание', UPDATE: 'Редактирование', DELETE: 'Удаление', RESTORE: 'Восстановление' })[event.action] || event.action}</td>
+                        <td>{event.studentName}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+        </details>
+      )}
     </section>
   );
 }
