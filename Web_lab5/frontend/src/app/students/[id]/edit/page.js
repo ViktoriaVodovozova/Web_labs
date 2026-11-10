@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { updateStudentAction } from '../../actions';
 
 async function fetchStudent(id, token) {
-  const res = await fetch(`${process.env.API_BASE_URL || 'http://localhost:8000'}/api/requests/${id}`, { headers: { Authorization: `Bearer ${token}` }, cache: 'no-store' });
+  const res = await fetch(`${process.env.API_BASE_URL || 'http://localhost:8000'}/api/requests/${id}`, { headers: { Authorization: `Bearer ${token}` }, next: { revalidate: 60, tags: ['students'] } });
   if (!res.ok) return null; return res.json();
 }
 

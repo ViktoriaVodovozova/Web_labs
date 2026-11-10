@@ -1,8 +1,6 @@
 package students.controller;
 
 import students.service.StudentService;
-import students.service.AuditService;
-import org.springframework.security.core.Authentication;
 import students.dto.*;
 
 import org.springframework.web.bind.annotation.*;
@@ -18,11 +16,9 @@ import java.util.List;
 @SecurityRequirement(name = "bearerAuth")
 public class StudentController {
     private final StudentService service;
-    private final AuditService audit;
 
-    public StudentController(StudentService service, AuditService audit) {
+    public StudentController(StudentService service) {
         this.service = service;
-        this.audit = audit;
     }
 
     @GetMapping
@@ -56,38 +52,32 @@ public class StudentController {
     }
 
     @PostMapping
-    public ResponseEntity<StudentResponse> create(@Valid @RequestBody StudentRequest request, Authentication auth) {
+    public ResponseEntity<StudentResponse> create(@Valid @RequestBody StudentRequest request) {
         StudentResponse student = service.create(request);
-        audit.record(auth.getName(), "CREATE", student);
         return ResponseEntity.status(201).body(student);
     }
 
     @PutMapping("/{id}")
-    public StudentResponse replace(@PathVariable String id, @Valid @RequestBody StudentRequest request, Authentication auth) {
+    public StudentResponse replace(@PathVariable String id, @Valid @RequestBody StudentRequest request) {
         StudentResponse student = service.replace(id, request);
-        audit.record(auth.getName(), "UPDATE", student);
         return student;
     }
 
     @PatchMapping("/{id}")
-    public StudentResponse update(@PathVariable String id, @RequestBody StudentUpdateRequest request, Authentication auth) {
+    public StudentResponse update(@PathVariable String id, @RequestBody StudentUpdateRequest request) {
         StudentResponse student = service.update(id, request);
-        audit.record(auth.getName(), "UPDATE", student);
         return student;
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable String id, Authentication auth) {
-        StudentResponse student = service.getById(id);
+    public ResponseEntity<Void> delete(@PathVariable String id) {
         service.delete(id);
-        audit.record(auth.getName(), "DELETE", student);
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/{id}/restore")
-    public StudentResponse restore(@PathVariable String id, Authentication auth) {
+    public StudentResponse restore(@PathVariable String id) {
         StudentResponse student = service.restore(id);
-        audit.record(auth.getName(), "RESTORE", student);
         return student;
     }
 

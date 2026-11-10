@@ -1,9 +1,8 @@
 'use client';
-import { useRouter, useSearchParams, usePathname } from 'next/navigation';
+import { useSearchParams, usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
 
-export default function StudentFilters() {
-  const router = useRouter();
+export default function StudentFilters({ navigate }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
@@ -19,7 +18,7 @@ export default function StudentFilters() {
     else params.delete(key);
 
     params.set('page', '0');
-    router.push(`${pathname}?${params.toString()}`);
+    navigate(`${pathname}?${params.toString()}`);
   };
 
   useEffect(() => {

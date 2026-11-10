@@ -6,7 +6,7 @@ import { deleteStudentAction } from '../actions';
 async function fetchStudent(id, token) {
   const res = await fetch(`${process.env.API_BASE_URL || 'http://localhost:8000'}/api/requests/${id}`, {
     headers: { Authorization: `Bearer ${token}` },
-    cache: 'no-store'
+    next: { revalidate: 60, tags: ['students'] }
   });
   if (res.status === 404) return null;
   if (!res.ok) throw new Error('Ошибка');
