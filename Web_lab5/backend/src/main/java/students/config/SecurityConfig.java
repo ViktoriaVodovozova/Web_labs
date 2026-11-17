@@ -9,12 +9,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import org.springframework.context.annotation.*;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.firewall.StrictHttpFirewall;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -26,6 +26,15 @@ import java.util.List;
 
 @Configuration
 public class SecurityConfig {
+    @Bean
+    StrictHttpFirewall httpFirewall() {
+        StrictHttpFirewall firewall = new StrictHttpFirewall();
+        firewall.setAllowedHttpMethods(List.of(
+            "DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT", "QUERY"
+        ));
+        return firewall;
+    }
+
     @Bean
     PasswordEncoder passwordEncoder() { return new BCryptPasswordEncoder(); }
 
@@ -59,7 +68,11 @@ public class SecurityConfig {
             .authorizeHttpRequests(a -> a
                 .requestMatchers("/api/auth/me").authenticated()
                 .requestMatchers("/api/auth/**", "/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**", "/error").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/requests", "/api/requests/**").hasAnyRole("USER", "ADMIN")
+                .requestMatchers(request -> {
+                    String path = request.getRequestURI().substring(request.getContextPath().length());
+                    return "QUERY".equalsIgnoreCase(request.getMethod())
+                        && (path.equals("/api/requests") || path.startsWith("/api/requests/"));
+                }).hasAnyRole("USER", "ADMIN")
                 .requestMatchers("/api/requests", "/api/requests/**").hasRole("ADMIN")
                 .requestMatchers("/api/**").authenticated().anyRequest().permitAll())
             .exceptionHandling(e -> e

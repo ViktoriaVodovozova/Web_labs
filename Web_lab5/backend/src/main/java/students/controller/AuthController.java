@@ -30,7 +30,7 @@ public class AuthController {
         return service.refresh(request);
     }
 
-    @GetMapping("/me")
+    @RequestMapping(path = "/me", method = RequestMethod.QUERY)
     public ProfileResponse me(java.security.Principal principal) {
         if (principal == null) throw new ErrorHandler.ApiException(401, "Необходима авторизация");
         return service.profile(principal.getName());

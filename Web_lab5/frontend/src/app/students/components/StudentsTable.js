@@ -9,12 +9,15 @@ async function fetchStudents(searchParams, token) {
   if (!query.has('size')) query.set('size', '1000');
 
   const res = await fetch(`${process.env.API_BASE_URL || 'http://localhost:8000'}/api/requests?${query.toString()}`, {
-    headers: { Authorization: `Bearer ${token}` },
-    // Кэш Next.js: 60 секунд; ключ учитывает URL и заголовок Authorization.
-    // Тег позволяет сразу сбросить кэш после CRUD-операций.
+    method: 'QUERY',
+    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+    body: '{}',
     next: { revalidate: 60, tags: ['students'] }
   });
-  if (!res.ok) throw new Error(`Ошибка загрузки студентов: HTTP ${res.status}`);
+  if (!res.ok) {
+    const detail = await res.text();
+    throw new Error(`Ошибка загрузки студентов: HTTP ${res.status} — ${detail.slice(0, 300)}`);
+  }
   return {
     data: await res.json(),
     total: res.headers.get('X-Total-Count') || '0',
@@ -23,7 +26,6 @@ async function fetchStudents(searchParams, token) {
   };
 }
 
-// Async Server Component: the table streams in after its backend request completes.
 export default async function StudentsTable({ searchParams, token }) {
   await new Promise(resolve => setTimeout(resolve, 1500));
 

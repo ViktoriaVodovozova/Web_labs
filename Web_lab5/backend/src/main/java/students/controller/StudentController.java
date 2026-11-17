@@ -21,7 +21,7 @@ public class StudentController {
         this.service = service;
     }
 
-    @GetMapping
+    @RequestMapping(method = RequestMethod.QUERY)
     public ResponseEntity<List<StudentResponse>> getAll(
         @RequestParam(required = false) String group,
         @RequestParam(required = false) Integer dormitory,
@@ -46,7 +46,7 @@ public class StudentController {
             .body(result.getContent());
     }
 
-    @GetMapping("/{id}")
+    @RequestMapping(path = "/{id}", method = RequestMethod.QUERY)
     public StudentResponse getById(@PathVariable String id) {
         return service.getById(id);
     }

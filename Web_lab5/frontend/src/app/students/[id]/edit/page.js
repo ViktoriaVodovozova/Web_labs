@@ -5,10 +5,11 @@ import { updateStudentAction } from '../../actions';
 
 async function fetchStudent(id, token) {
   const baseUrl = process.env.API_BASE_URL || 'http://localhost:8000';
-//  GET -> QUERY
-  // МЕНЯЕМ ЗДЕСЬ: используем query-параметр ?id= вместо пути /${id}
+
   const res = await fetch(`${baseUrl}/api/requests?id=${id}`, {
-    headers: { Authorization: `Bearer ${token}` },
+    method: 'QUERY',
+    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+    body: '{}',
     next: { revalidate: 60, tags: ['students'] }
   });
 
@@ -16,7 +17,6 @@ async function fetchStudent(id, token) {
 
   const data = await res.json();
 
-  // ВАЖНО: getAll возвращает массив, даже если нашли одного. Берем первого.
   return data.length > 0 ? data[0] : null;
 }
 
@@ -24,15 +24,15 @@ export default async function EditStudentPage({ params }) {
   const cookieStore = await cookies();
   const token = cookieStore.get('accessToken')?.value;
 
-  // Если токена нет вообще, даже не дергаем Java
   if (!token) redirect('/login');
 
   const { id } = await params;
   const baseUrl = process.env.API_BASE_URL || 'http://localhost:8000';
 
-  // Проверка на админа
   const me = await fetch(`${baseUrl}/api/auth/me`, {
-    headers: { Authorization: `Bearer ${token}` },
+    method: 'QUERY',
+    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+    body: '{}',
     cache: 'no-store'
   });
 

@@ -6,9 +6,10 @@ import { deleteStudentAction } from '../actions';
 async function fetchStudent(id, token) {
   const baseUrl = process.env.API_BASE_URL || 'http://localhost:8000';
 
-  // МЕНЯЕМ ЗДЕСЬ: используем query-параметр ?id= вместо пути /${id}
   const res = await fetch(`${baseUrl}/api/requests?id=${id}`, {
-    headers: { Authorization: `Bearer ${token}` },
+    method: 'QUERY',
+    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+    body: '{}',
     next: { revalidate: 60, tags: ['students'] }
   });
 
@@ -16,7 +17,6 @@ async function fetchStudent(id, token) {
 
   const data = await res.json();
 
-  // ВАЖНО: getAll возвращает массив, даже если нашли одного. Берем первого.
   return data.length > 0 ? data[0] : null;
 }
 
@@ -27,7 +27,9 @@ export default async function StudentDetailPage({ params }) {
 
   const baseUrl = process.env.API_BASE_URL || 'http://localhost:8000';
   const me = await fetch(`${baseUrl}/api/auth/me`, {
-    headers: { Authorization: `Bearer ${token}` },
+    method: 'QUERY',
+    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+    body: '{}',
     cache: 'no-store'
   });
 

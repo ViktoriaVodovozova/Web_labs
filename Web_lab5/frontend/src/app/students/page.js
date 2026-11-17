@@ -18,11 +18,8 @@ export default async function StudentsPage({ searchParams }) {
         {isAdmin && <Link href="/students/new" className="btn-add">Добавить студента</Link>}
       </div>
 
-      {/* Фильтры видны всегда */}
       <StudentFilters />
 
-      {/* А вот тут магия: пока таблица грузится (наши 1.5 сек),
-          вместо неё будет показываться StudentsSkeleton */}
       <Suspense fallback={<StudentsSkeleton />}>
         <StudentsTable searchParams={searchParams} token={token} />
       </Suspense>
