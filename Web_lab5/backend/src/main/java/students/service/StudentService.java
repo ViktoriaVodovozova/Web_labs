@@ -32,8 +32,11 @@ public class StudentService {
     public Page<StudentResponse> getAll(String group, Integer dormitory, Boolean isForeigner,
         String search, String id, String fullName, String isuId, Integer room,
         LocalDate moveInDate, String notes, int page, int size, String sortBy, String direction) {
-        if (page < 0 || size < 1 || size > 100)
-            throw new ApiException(400, "page должен быть от 0, size — от 1 до 100");
+
+        // ИЗМЕНЕНО ЗДЕСЬ: размер страницы теперь может быть до 5000
+        if (page < 0 || size < 1 || size > 5000)
+            throw new ApiException(400, "page должен быть от 0, size — от 1 до 5000");
+
         if ((dormitory != null && dormitory < 1) || (room != null && room < 1))
             throw new ApiException(400, "Номера общежития и комнаты должны быть положительными");
         if (!SORT_FIELDS.contains(sortBy)) throw new ApiException(400, "Неизвестное поле сортировки");
@@ -41,10 +44,11 @@ public class StudentService {
             throw new ApiException(400, "direction должен быть asc или desc");
         Sort sort = Sort.by(Sort.Direction.fromString(direction), sortBy);
         if (!sortBy.equals("id")) sort = sort.and(Sort.by("id"));
+
         return students.findAll((root, query, cb) -> {
             var predicates = new ArrayList<jakarta.persistence.criteria.Predicate>();
             predicates.add(cb.isFalse(root.get("deleted")));
-            // locate treats % and _ as ordinary characters, unlike LIKE.
+
             String[][] textFilters = {{"id", id}, {"fullName", fullName}, {"group", group},
                 {"isuId", isuId}, {"notes", notes}};
             for (String[] f : textFilters) {

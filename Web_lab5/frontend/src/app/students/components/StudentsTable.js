@@ -6,7 +6,7 @@ async function fetchStudents(searchParams, token) {
     if (typeof value === 'string' && value) query.append(key, value);
   }
   if (!query.has('page')) query.set('page', '0');
-  if (!query.has('size')) query.set('size', '10');
+  if (!query.has('size')) query.set('size', '1000');
 
   const res = await fetch(`${process.env.API_BASE_URL || 'http://localhost:8000'}/api/requests?${query.toString()}`, {
     headers: { Authorization: `Bearer ${token}` },
@@ -26,7 +26,9 @@ async function fetchStudents(searchParams, token) {
 // Async Server Component: the table streams in after its backend request completes.
 export default async function StudentsTable({ searchParams, token }) {
   await new Promise(resolve => setTimeout(resolve, 1500));
+
   const params = await searchParams;
+
   let studentsData;
   try {
     studentsData = await fetchStudents(params, token);

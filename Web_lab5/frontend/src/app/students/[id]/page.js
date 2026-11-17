@@ -4,20 +4,33 @@ import { notFound, redirect } from 'next/navigation';
 import { deleteStudentAction } from '../actions';
 
 async function fetchStudent(id, token) {
-  const res = await fetch(`${process.env.API_BASE_URL || 'http://localhost:8000'}/api/requests/${id}`, {
+  const baseUrl = process.env.API_BASE_URL || 'http://localhost:8000';
+
+  // МЕНЯЕМ ЗДЕСЬ: используем query-параметр ?id= вместо пути /${id}
+  const res = await fetch(`${baseUrl}/api/requests?id=${id}`, {
     headers: { Authorization: `Bearer ${token}` },
     next: { revalidate: 60, tags: ['students'] }
   });
-  if (res.status === 404) return null;
+
   if (!res.ok) throw new Error('Ошибка');
-  return res.json();
+
+  const data = await res.json();
+
+  // ВАЖНО: getAll возвращает массив, даже если нашли одного. Берем первого.
+  return data.length > 0 ? data[0] : null;
 }
 
 export default async function StudentDetailPage({ params }) {
   const cookieStore = await cookies();
   const token = cookieStore.get('accessToken')?.value;
   if (!token) redirect('/login');
-  const me = await fetch(`${process.env.API_BASE_URL || 'http://localhost:8000'}/api/auth/me`, {headers:{Authorization:`Bearer ${token}`},cache:'no-store'});
+
+  const baseUrl = process.env.API_BASE_URL || 'http://localhost:8000';
+  const me = await fetch(`${baseUrl}/api/auth/me`, {
+    headers: { Authorization: `Bearer ${token}` },
+    cache: 'no-store'
+  });
+
   if (me.status === 401 || me.status === 403) redirect('/login');
   const isAdmin = me.ok && (await me.json()).role === 'ADMIN';
 

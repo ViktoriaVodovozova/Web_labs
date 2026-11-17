@@ -4,15 +4,43 @@ import Link from 'next/link';
 import { updateStudentAction } from '../../actions';
 
 async function fetchStudent(id, token) {
-  const res = await fetch(`${process.env.API_BASE_URL || 'http://localhost:8000'}/api/requests/${id}`, { headers: { Authorization: `Bearer ${token}` }, next: { revalidate: 60, tags: ['students'] } });
-  if (!res.ok) return null; return res.json();
+  const baseUrl = process.env.API_BASE_URL || 'http://localhost:8000';
+//  GET -> QUERY
+  // МЕНЯЕМ ЗДЕСЬ: используем query-параметр ?id= вместо пути /${id}
+  const res = await fetch(`${baseUrl}/api/requests?id=${id}`, {
+    headers: { Authorization: `Bearer ${token}` },
+    next: { revalidate: 60, tags: ['students'] }
+  });
+
+  if (!res.ok) return null;
+
+  const data = await res.json();
+
+  // ВАЖНО: getAll возвращает массив, даже если нашли одного. Берем первого.
+  return data.length > 0 ? data[0] : null;
 }
 
 export default async function EditStudentPage({ params }) {
-  const cookieStore = await cookies(); const token = cookieStore.get('accessToken')?.value; const { id } = await params;
-  const me = await fetch(`${process.env.API_BASE_URL || 'http://localhost:8000'}/api/auth/me`, {headers:{Authorization:`Bearer ${token}`},cache:'no-store'});
+  const cookieStore = await cookies();
+  const token = cookieStore.get('accessToken')?.value;
+
+  // Если токена нет вообще, даже не дергаем Java
+  if (!token) redirect('/login');
+
+  const { id } = await params;
+  const baseUrl = process.env.API_BASE_URL || 'http://localhost:8000';
+
+  // Проверка на админа
+  const me = await fetch(`${baseUrl}/api/auth/me`, {
+    headers: { Authorization: `Bearer ${token}` },
+    cache: 'no-store'
+  });
+
   if (!me.ok || (await me.json()).role !== 'ADMIN') redirect('/students');
-  const student = await fetchStudent(id, token); if (!student) return <div className="alert error">Студент не найден</div>;
+
+  const student = await fetchStudent(id, token);
+  if (!student) return <div className="alert error">Студент не найден</div>;
+
   const updateActionWithId = updateStudentAction.bind(null, id);
 
   return (

@@ -1,8 +1,9 @@
 'use client';
-import { useSearchParams, usePathname } from 'next/navigation';
+import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
 
-export default function StudentFilters({ navigate }) {
+export default function StudentFilters() {
+  const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
@@ -18,7 +19,7 @@ export default function StudentFilters({ navigate }) {
     else params.delete(key);
 
     params.set('page', '0');
-    navigate(`${pathname}?${params.toString()}`);
+    router.push(`${pathname}?${params.toString()}`);
   };
 
   useEffect(() => {
@@ -30,8 +31,27 @@ export default function StudentFilters({ navigate }) {
 
   return (
     <div className="toolbar">
-      <input type="search" placeholder="Поиск..." value={search} onChange={e => setSearch(e.target.value)} />
-      <input type="text" placeholder="Группа" value={group} onChange={e => setGroup(e.target.value)} onBlur={() => updateURL('group', group)} />
+      <input
+        type="search"
+        placeholder="Поиск..."
+        value={search}
+        onChange={e => setSearch(e.target.value)}
+      />
+
+      <input
+        type="text"
+        placeholder="Группа"
+        value={group}
+        onChange={e => setGroup(e.target.value)}
+        onBlur={() => updateURL('group', group)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            updateURL('group', group);
+          }
+        }}
+      />
+
       <select aria-label="Сортировать по" value={sortBy} onChange={e => { setSortBy(e.target.value); updateURL('sortBy', e.target.value); }}>
         <option value="fullName">По ФИО</option>
         <option value="group">По группе</option>
