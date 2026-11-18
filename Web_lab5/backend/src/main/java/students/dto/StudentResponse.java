@@ -3,9 +3,9 @@ package students.dto;
 import java.time.LocalDate;
 import students.entity.Student;
 
-public record StudentResponse(String id, String fullName, String group, String isuId, Integer dormitory, Integer room, LocalDate moveInDate, boolean isForeigner, String notes) {
+public record StudentResponse(String id, String fullName, String group, String isuId, Integer dormitory, Integer room, LocalDate moveInDate, boolean isForeigner, String notes, Long version) {
     public static StudentResponse fromStudent(Student s) {
         return new StudentResponse(s.id, s.fullName, s.group, s.isuId,
-            s.dormitory, s.room, s.moveInDate, s.isForeigner, s.notes);
+            s.dormitory, s.room, s.moveInDate, s.isForeigner, s.notes, s.version);
     }
 }

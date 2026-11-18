@@ -33,7 +33,6 @@ public class StudentService {
         String search, String id, String fullName, String isuId, Integer room,
         LocalDate moveInDate, String notes, int page, int size, String sortBy, String direction) {
 
-        // ИЗМЕНЕНО ЗДЕСЬ: размер страницы теперь может быть до 5000
         if (page < 0 || size < 1 || size > 5000)
             throw new ApiException(400, "page должен быть от 0, size — от 1 до 5000");
 
@@ -87,8 +86,9 @@ public class StudentService {
         return StudentResponse.fromStudent(student);
     }
 
-    public StudentResponse replace(String id, StudentRequest request) {
+    public StudentResponse replace(String id, StudentRequest request, Long expectedVersion) {
         Student student = findStudent(id);
+        checkVersion(student, expectedVersion);
         StudentRequest data = normalize(request);
         validate(data);
         checkIsu(data.isuId(), id);
@@ -98,7 +98,7 @@ public class StudentService {
         return StudentResponse.fromStudent(student);
     }
 
-    public StudentResponse update(String id, StudentUpdateRequest request) {
+    public StudentResponse update(String id, StudentUpdateRequest request, Long expectedVersion) {
         Student student = findStudent(id);
         StudentRequest merged = new StudentRequest(
             request.fullName() != null ? request.fullName() : student.fullName,
@@ -109,11 +109,12 @@ public class StudentService {
             request.moveInDate() != null ? request.moveInDate() : student.moveInDate,
             request.isForeigner() != null ? request.isForeigner() : student.isForeigner,
             request.notes() != null ? request.notes() : student.notes);
-        return replace(id, merged);
+        return replace(id, merged, expectedVersion);
     }
 
     public void delete(String id) {
-        Student student = findStudent(id);
+        Student student = students.findById(id).orElse(null);
+        if (student == null || student.deleted) return;
         student.deleted = true;
         students.saveAndFlush(student);
         log.info("Удалён студент {}", id);
@@ -124,6 +125,11 @@ public class StudentService {
         student.deleted = false;
         students.saveAndFlush(student);
         return StudentResponse.fromStudent(student);
+    }
+
+    private void checkVersion(Student student, Long expectedVersion) {
+        if (expectedVersion == null || !expectedVersion.equals(student.version))
+            throw new ApiException(409, "Запись была изменена другим пользователем. Обновите страницу и повторите действие");
     }
 
     private Student findStudent(String id) {

@@ -5,6 +5,9 @@ import java.time.LocalDate;
 @Entity
 @Table(name = "students")
 public class Student {
+    @Version
+    @Column(nullable = true)
+    public Long version;
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     public String id;

@@ -58,14 +58,14 @@ public class StudentController {
     }
 
     @PutMapping("/{id}")
-    public StudentResponse replace(@PathVariable String id, @Valid @RequestBody StudentRequest request) {
-        StudentResponse student = service.replace(id, request);
+    public StudentResponse replace(@PathVariable String id, @Valid @RequestBody StudentRequest request, @RequestHeader("If-Match") Long version) {
+        StudentResponse student = service.replace(id, request, version);
         return student;
     }
 
     @PatchMapping("/{id}")
-    public StudentResponse update(@PathVariable String id, @RequestBody StudentUpdateRequest request) {
-        StudentResponse student = service.update(id, request);
+    public StudentResponse update(@PathVariable String id, @RequestBody StudentUpdateRequest request, @RequestHeader("If-Match") Long version) {
+        StudentResponse student = service.update(id, request, version);
         return student;
     }
 

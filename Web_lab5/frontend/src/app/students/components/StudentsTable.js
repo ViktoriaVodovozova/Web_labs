@@ -12,7 +12,7 @@ async function fetchStudents(searchParams, token) {
     method: 'QUERY',
     headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
     body: '{}',
-    next: { revalidate: 60, tags: ['students'] }
+    cache: 'no-store'
   });
   if (!res.ok) {
     const detail = await res.text();

@@ -10,6 +10,7 @@ export default async function StudentsPage({ searchParams }) {
   const token = cookieStore.get('accessToken')?.value;
   const role = cookieStore.get('role')?.value;
   const isAdmin = role === 'ADMIN';
+  const query = await searchParams;
 
   return (
     <section className="card">
@@ -18,6 +19,7 @@ export default async function StudentsPage({ searchParams }) {
         {isAdmin && <Link href="/students/new" className="btn-add">Добавить студента</Link>}
       </div>
 
+      {query?.notice === 'delete-failed' && <div className="alert error" role="alert">Не удалось удалить запись. Обновите страницу и повторите попытку.</div>}
       <StudentFilters />
 
       <Suspense fallback={<StudentsSkeleton />}>

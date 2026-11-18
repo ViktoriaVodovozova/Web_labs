@@ -6,6 +6,8 @@ import students.repository.StudentRepository;
 import students.entity.Student;
 
 import org.springframework.boot.*;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.core.annotation.Order;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.beans.factory.annotation.Value;
@@ -34,6 +36,13 @@ public class Application {
                 users.save(new User("admin", "admin@example.com", encoder.encode(password), "ADMIN"));
             }
         };
+    }
+
+    // Инициализируем версию для записей, созданных до добавления optimistic locking.
+    @Bean
+    @Order(-10)
+    CommandLineRunner initializeStudentVersions(JdbcTemplate jdbc) {
+        return args -> jdbc.update("UPDATE students SET version = 0 WHERE version IS NULL");
     }
 
     // ВОТ ЭТОТ БЛОК ГЕНЕРИРУЕТ 1000 СТУДЕНТОВ

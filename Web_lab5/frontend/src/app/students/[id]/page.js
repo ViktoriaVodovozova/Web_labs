@@ -1,23 +1,25 @@
 import { cookies } from 'next/headers';
 import Link from 'next/link';
-import { notFound, redirect } from 'next/navigation';
+import { redirect } from 'next/navigation';
 import { deleteStudentAction } from '../actions';
 
 async function fetchStudent(id, token) {
   const baseUrl = process.env.API_BASE_URL || 'http://localhost:8000';
-
-  const res = await fetch(`${baseUrl}/api/requests?id=${id}`, {
-    method: 'QUERY',
-    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-    body: '{}',
-    next: { revalidate: 60, tags: ['students'] }
-  });
-
-  if (!res.ok) throw new Error('Ошибка');
-
-  const data = await res.json();
-
-  return data.length > 0 ? data[0] : null;
+  try {
+    const res = await fetch(`${baseUrl}/api/requests/${encodeURIComponent(id)}`, {
+      method: 'QUERY',
+      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+      body: '{}',
+      cache: 'no-store'
+    });
+    if (res.status === 404) return { kind: 'missing' };
+    if (res.status === 401 || res.status === 403) return { kind: 'unauthorized' };
+    if (!res.ok) return { kind: 'unavailable', status: res.status };
+    return { kind: 'ok', student: await res.json() };
+  } catch (error) {
+    console.error('STUDENT DETAIL FETCH FAILED:', error);
+    return { kind: 'unavailable' };
+  }
 }
 
 export default async function StudentDetailPage({ params }) {
@@ -37,8 +39,23 @@ export default async function StudentDetailPage({ params }) {
   const isAdmin = me.ok && (await me.json()).role === 'ADMIN';
 
   const { id } = await params;
-  const student = await fetchStudent(id, token);
-  if (!student) notFound();
+  const result = await fetchStudent(id, token);
+  if (result.kind === 'unauthorized') redirect('/login');
+  if (result.kind === 'missing') return (
+    <section className="card narrow">
+      <h2>Студент уже удалён или не найден</h2>
+      <p>Запись могла быть удалена другим пользователем.</p>
+      <Link href="/students" className="button primary">Вернуться к списку</Link>
+    </section>
+  );
+  if (result.kind === 'unavailable') return (
+    <section className="card narrow">
+      <h2>Не удалось загрузить студента</h2>
+      <p>Сервер временно недоступен{result.status ? ` (HTTP ${result.status})` : ''}. Попробуйте открыть страницу снова.</p>
+      <Link href="/students" className="button">К списку студентов</Link>
+    </section>
+  );
+  const student = result.student;
 
   const deleteActionWithId = deleteStudentAction.bind(null, id);
 

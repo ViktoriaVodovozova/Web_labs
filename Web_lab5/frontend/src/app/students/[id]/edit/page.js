@@ -1,23 +1,24 @@
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
-import Link from 'next/link';
-import { updateStudentAction } from '../../actions';
+import EditStudentForm from '../../components/EditStudentForm';
 
 async function fetchStudent(id, token) {
   const baseUrl = process.env.API_BASE_URL || 'http://localhost:8000';
-
-  const res = await fetch(`${baseUrl}/api/requests?id=${id}`, {
-    method: 'QUERY',
-    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-    body: '{}',
-    next: { revalidate: 60, tags: ['students'] }
-  });
-
-  if (!res.ok) return null;
-
-  const data = await res.json();
-
-  return data.length > 0 ? data[0] : null;
+  try {
+    const res = await fetch(`${baseUrl}/api/requests/${encodeURIComponent(id)}`, {
+      method: 'QUERY',
+      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+      body: '{}',
+      cache: 'no-store'
+    });
+    if (res.status === 404) return { kind: 'missing' };
+    if (res.status === 401 || res.status === 403) return { kind: 'unauthorized' };
+    if (!res.ok) return { kind: 'unavailable', status: res.status };
+    return { kind: 'ok', student: await res.json() };
+  } catch (error) {
+    console.error('STUDENT EDIT FETCH FAILED:', error);
+    return { kind: 'unavailable' };
+  }
 }
 
 export default async function EditStudentPage({ params }) {
@@ -38,24 +39,10 @@ export default async function EditStudentPage({ params }) {
 
   if (!me.ok || (await me.json()).role !== 'ADMIN') redirect('/students');
 
-  const student = await fetchStudent(id, token);
-  if (!student) return <div className="alert error">Студент не найден</div>;
+  const result = await fetchStudent(id, token);
+  if (result.kind === 'unauthorized') redirect('/login');
+  if (result.kind === 'missing') return <div className="alert error">Студент был удалён другим пользователем или не найден. <a href="/students">К списку</a></div>;
+  if (result.kind === 'unavailable') return <div className="alert error">Не удалось загрузить студента{result.status ? ` (HTTP ${result.status})` : ''}. <a href="/students">К списку</a></div>;
 
-  const updateActionWithId = updateStudentAction.bind(null, id);
-
-  return (
-    <section className="card narrow"><h2>Редактировать студента</h2>
-      <form action={updateActionWithId} className="form-grid">
-        <div className="field"><label>ФИО *</label><input type="text" name="fullName" required defaultValue={student.fullName} maxLength={200} /></div>
-        <div className="field"><label>Группа *</label><input type="text" name="group" required defaultValue={student.group} maxLength={100} /></div>
-        <div className="field"><label>ИСУ ID *</label><input type="text" name="isuId" required defaultValue={student.isuId} pattern="[0-9]{6}" title="Ровно 6 цифр" /></div>
-        <div className="field"><label>Общежитие *</label><input type="number" name="dormitory" required defaultValue={student.dormitory} min="1" /></div>
-        <div className="field"><label>Комната *</label><input type="number" name="room" required defaultValue={student.room} min="1" /></div>
-        <div className="field"><label>Дата заселения *</label><input type="date" name="moveInDate" required defaultValue={student.moveInDate} /></div>
-        <div className="field span-all"><label className="checkbox"><input type="checkbox" name="isForeigner" defaultChecked={student.isForeigner} /> Иностранный студент</label></div>
-        <div className="field span-all"><label>Заметки</label><textarea name="notes" rows="4" defaultValue={student.notes} maxLength={5000}></textarea></div>
-        <div className="form-actions span-all"><button type="submit" className="primary">Сохранить</button><Link href={`/students/${id}`} className="button">Отмена</Link></div>
-      </form>
-    </section>
-  );
+  return <EditStudentForm student={result.student} />;
 }

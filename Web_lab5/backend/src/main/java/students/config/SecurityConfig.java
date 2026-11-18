@@ -78,7 +78,8 @@ public class SecurityConfig {
             .exceptionHandling(e -> e
                 .authenticationEntryPoint((req, res, ex) -> ErrorHandler.writeError(mapper, res, 401, "Необходима авторизация"))
                 .accessDeniedHandler((req, res, ex) -> ErrorHandler.writeError(mapper, res, 403, "Недостаточно прав")))
-            .addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class);
+            .addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class)
+            .addFilterBefore(new RateLimitFilter(), UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 }

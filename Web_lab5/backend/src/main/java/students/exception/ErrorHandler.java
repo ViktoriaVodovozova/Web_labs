@@ -13,6 +13,8 @@ import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
+import org.springframework.web.bind.MissingRequestHeaderException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.io.IOException;
@@ -54,6 +56,16 @@ public class ErrorHandler {
         MissingServletRequestParameterException.class})
     public ResponseEntity<Map<String, Object>> handleBadRequest(Exception e) {
         return error(400, "Некорректный формат запроса или параметров");
+    }
+
+    @ExceptionHandler(ObjectOptimisticLockingFailureException.class)
+    public ResponseEntity<Map<String, Object>> handleConcurrentModification(ObjectOptimisticLockingFailureException e) {
+        return error(409, "Запись была изменена или удалена другим пользователем. Обновите страницу");
+    }
+
+    @ExceptionHandler(MissingRequestHeaderException.class)
+    public ResponseEntity<Map<String, Object>> handleMissingHeader(MissingRequestHeaderException e) {
+        return error(400, "Для обновления записи требуется заголовок If-Match с версией записи");
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
