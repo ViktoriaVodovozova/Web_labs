@@ -7,7 +7,7 @@ export default async function NewStudentPage() {
   const store = await cookies();
   const token = store.get('accessToken')?.value;
   if (!token) redirect('/login');
-  const me = await fetch(`${process.env.API_BASE_URL || process.env.INTERNAL_API_URL || 'http://java-backend:8000'}/api/auth/me`, {headers:{Authorization:`Bearer ${token}`},cache:'no-store'});
+  const me = await fetch(`${process.env.API_BASE_URL || process.env.INTERNAL_API_URL || 'http://java-backend:8000'}/api/auth/me`, {method: 'QUERY', headers:{Authorization:`Bearer ${token}`},cache:'no-store'});
   if (!me.ok || (await me.json()).role !== 'ADMIN') redirect('/students');
 
   return (

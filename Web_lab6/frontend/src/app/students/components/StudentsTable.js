@@ -6,13 +6,13 @@ async function fetchStudents(searchParams, token) {
     if (typeof value === 'string' && value) query.append(key, value);
   }
 
-  // ВОЗВРАЩАЕМ ПАГИНАЦИЮ: 10 записей на страницу
+
   if (!query.has('page')) query.set('page', '0');
   if (!query.has('size')) query.set('size', '10');
 
   const baseUrl = process.env.API_BASE_URL || 'http://java-backend:8000';
   const res = await fetch(`${baseUrl}/api/requests?${query.toString()}`, {
-    headers: { Authorization: `Bearer ${token}` },
+    method: 'QUERY', headers: { Authorization: `Bearer ${token}` },
     next: { revalidate: 60, tags: ['students'] }
   });
 
@@ -27,7 +27,7 @@ async function fetchStudents(searchParams, token) {
 }
 
 export default async function StudentsTable({ searchParams, token }) {
-  // Оставляем задержку для красивой демонстрации скелетона
+
   await new Promise(resolve => setTimeout(resolve, 1000));
 
   const params = await searchParams;
@@ -73,7 +73,7 @@ export default async function StudentsTable({ searchParams, token }) {
         </div>
       ) : <p className="empty">Студенты не найдены.</p>}
 
-      {/* Кнопки пагинации */}
+
       <div className="pagination">
         <div>
           {Number(currentPage) > 0 ? (

@@ -6,6 +6,8 @@ import students.repository.StudentRepository;
 import students.entity.Student;
 
 import org.springframework.boot.*;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.core.annotation.Order;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.beans.factory.annotation.Value;
@@ -36,7 +38,14 @@ public class Application {
         };
     }
 
-    // ВОТ ЭТОТ БЛОК ГЕНЕРИРУЕТ 1000 СТУДЕНТОВ
+
+    @Bean
+    @Order(-10)
+    CommandLineRunner initializeStudentVersions(JdbcTemplate jdbc) {
+        return args -> jdbc.update("UPDATE students SET version = 0 WHERE version IS NULL");
+    }
+
+
     @Bean
     CommandLineRunner seedStudents(StudentRepository studentRepository) {
         return args -> {
@@ -46,7 +55,7 @@ public class Application {
                     Student s = new Student();
                     s.fullName = "Студент Тестовый " + (char)('A' + i);
                     s.group = "P32" + String.format("%02d", (i % 10) + 1);
-                    s.isuId = String.format("%06d", i); // ИСУ ID от 000001 до 001000
+                    s.isuId = String.format("%06d", i);
                     s.dormitory = (i % 10) + 1;
                     s.room = (i % 100) + 1;
                     s.moveInDate = LocalDate.of(2023, 9, 1).minusDays(i % 100);

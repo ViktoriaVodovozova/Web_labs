@@ -42,31 +42,31 @@ async function route(req, res) {
   const q = Object.fromEntries(url.searchParams);
   const m = req.method;
 
-  if (m === 'GET' && p === '/health') return json(res, 200, { ok: true, auditEntries: audit.entries.length });
+  if (m === 'QUERY' && p === '/health') return json(res, 200, { ok: true, auditEntries: audit.entries.length });
 
-  // --- служебный канал Java -> Node (недоступен снаружи: закрыт в nginx + ключ) ---
+
   if (m === 'POST' && p === '/internal/events') {
     checkServiceKey(req);
     const ev = await readJson(req);
-    const r = await audit.append(ev); // 200 только после записи на диск
+    const r = await audit.append(ev);
     if (!r.duplicate) hub.broadcastAdmins('student.event', r.entry);
     return json(res, 200, { ok: true, duplicate: r.duplicate, seq: r.entry.seq });
   }
 
-  // --- билет для WebSocket ---
+
   if (m === 'POST' && p === '/ticket') {
     const { user, token } = await authenticate(req);
     return json(res, 200, { ticket: issueTicket(user, token), expiresInSec: config.ticketTtlMs / 1000, user });
   }
 
-  // --- просмотр журнала ---
-  if (m === 'GET' && p === '/audit') {
+
+  if (m === 'QUERY' && p === '/audit') {
     const { user } = await authenticate(req);
     requireRole(user, config.auditRoles);
     return json(res, 200, audit.query(q));
   }
 
-  // --- экспорт ---
+
   if (m === 'POST' && p === '/export') {
     const { user, token } = await authenticate(req);
     requireRole(user, config.importExportRoles);
@@ -74,7 +74,7 @@ async function route(req, res) {
     return json(res, 202, { jobId: job.id });
   }
 
-  // --- импорт: тело запроса — сырой CSV, принимаем потоком ---
+
   if (m === 'POST' && p === '/import') {
     const { user, token } = await authenticate(req);
     requireRole(user, config.importExportRoles);
@@ -91,7 +91,7 @@ async function route(req, res) {
       },
     });
     try {
-      await pipeline(req, limiter, fs.createWriteStream(tmp)); // backpressure: диск медленнее сети — сеть притормаживает
+      await pipeline(req, limiter, fs.createWriteStream(tmp));
     } catch (e) {
       await fs.promises.rm(tmp, { force: true });
       throw e instanceof HttpError ? e : new HttpError(400, 'Загрузка прервана');
@@ -100,9 +100,9 @@ async function route(req, res) {
     return json(res, 202, { jobId: id });
   }
 
-  // --- задания ---
+
   const mj = p.match(/^\/jobs\/([\w-]+)(\/file)?$/);
-  if (m === 'GET' && mj) {
+  if (m === 'QUERY' && mj) {
     const { user } = await authenticate(req);
     const job = jobs.get(mj[1]);
     if (!job || (String(job.owner.id) !== String(user.id) && user.role !== 'ADMIN')) throw new HttpError(404, 'Задание не найдено');
@@ -112,7 +112,7 @@ async function route(req, res) {
       'Content-Type': 'text/csv; charset=utf-8',
       'Content-Disposition': `attachment; filename="students-${job.id.slice(0, 8)}.csv"`,
     });
-    await pipeline(fs.createReadStream(job.file), res); // потоковая отдача большими порциями
+    await pipeline(fs.createReadStream(job.file), res);
     return;
   }
 
@@ -128,7 +128,7 @@ const server = http.createServer((req, res) => {
   });
 });
 
-// ---------------- WebSocket ----------------
+
 server.on('upgrade', (req, socket) => {
   const url = new URL(req.url, 'http://x');
   if (url.pathname !== '/ws') return rejectUpgrade(socket, 404, 'Not Found');
@@ -162,7 +162,7 @@ server.on('upgrade', (req, socket) => {
       case 'ping': return reply('pong');
       case 'audit.list':
         if (!config.auditRoles.includes(user.role)) return err('FORBIDDEN', 'Недостаточно прав');
-        return reply('audit.list.result', audit.query(m.payload || {})); // afterSeq — догон пропущенного после реконнекта
+        return reply('audit.list.result', audit.query(m.payload || {}));
       case 'job.get': {
         const j = jobs.get(m.payload?.id);
         if (!j || String(j.owner.id) !== String(user.id)) return err('NOT_FOUND', 'Задание не найдено');
@@ -173,7 +173,7 @@ server.on('upgrade', (req, socket) => {
   });
 });
 
-// Heartbeat: нет pong за интервал — закрываем «мёртвое» соединение
+
 setInterval(() => {
   for (const c of hub.clients) {
     if (!c.alive) { c.ws.terminate(); continue; }

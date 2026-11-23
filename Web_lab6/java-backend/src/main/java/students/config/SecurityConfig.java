@@ -27,6 +27,15 @@ import java.util.List;
 @Configuration
 public class SecurityConfig {
     @Bean
+    org.springframework.security.web.firewall.HttpFirewall httpFirewall() {
+        var firewall = new org.springframework.security.web.firewall.StrictHttpFirewall();
+        firewall.setAllowedHttpMethods(java.util.List.of(
+            "QUERY", "HEAD", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "TRACE"
+        ));
+        return firewall;
+    }
+
+    @Bean
     PasswordEncoder passwordEncoder() { return new BCryptPasswordEncoder(); }
 
     @Bean
@@ -59,13 +68,14 @@ public class SecurityConfig {
             .authorizeHttpRequests(a -> a
                 .requestMatchers("/api/auth/me").authenticated()
                 .requestMatchers("/api/auth/**", "/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**", "/error").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/requests", "/api/requests/**").hasAnyRole("USER", "ADMIN")
+                .requestMatchers(HttpMethod.valueOf("QUERY"), "/api/requests", "/api/requests/**").hasAnyRole("USER", "ADMIN")
                 .requestMatchers("/api/requests", "/api/requests/**").hasRole("ADMIN")
                 .requestMatchers("/api/**").authenticated().anyRequest().permitAll())
             .exceptionHandling(e -> e
                 .authenticationEntryPoint((req, res, ex) -> ErrorHandler.writeError(mapper, res, 401, "Необходима авторизация"))
                 .accessDeniedHandler((req, res, ex) -> ErrorHandler.writeError(mapper, res, 403, "Недостаточно прав")))
-            .addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class);
+            .addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class)
+            .addFilterBefore(new RateLimitFilter(), UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 }

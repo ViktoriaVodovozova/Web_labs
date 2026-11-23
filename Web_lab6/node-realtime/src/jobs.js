@@ -9,7 +9,7 @@ import { HttpError, java, students } from './java.js';
 
 const MAX_ERRORS = 200;
 
-// Состояния: queued -> running -> done | failed
+
 export class Jobs {
   jobs = new Map();
 
@@ -45,14 +45,14 @@ export class Jobs {
   }
 
   #touch(j, force = false) {
-    if (!force && Date.now() - j.lastEmit < 250) return; // не заваливаем клиента событиями
+    if (!force && Date.now() - j.lastEmit < 250) return;
     j.lastEmit = Date.now();
     this.hub.toUser(j.owner.id, 'job.update', this.snapshot(j));
   }
 
   get(id) { return this.jobs.get(id); }
 
-  // ---------- Экспорт ----------
+
   startExport(user, token, delimiter = ',') {
     const job = this.#create('export', user, token, { delimiter });
     this.#runExport(job).catch(() => {});
@@ -90,7 +90,7 @@ export class Jobs {
     this.#touch(job, true);
   }
 
-  // ---------- Импорт ----------
+
   startImport({ id, user, token, file, onConflict, delimiter }) {
     const job = this.#create('import', user, token, { id, file, onConflict, delimiter });
     this.#runImport(job).catch(() => {});
@@ -107,7 +107,7 @@ export class Jobs {
       if (job.errors.length < MAX_ERRORS) job.errors.push({ row, code, message });
     };
     try {
-      // Снимок текущего состояния для поиска дубликатов/конфликтов
+
       const byId = new Map();
       const byIsu = new Map();
       for await (const { items } of students(job.token)) {
@@ -175,12 +175,12 @@ export class Jobs {
             fail(line, 'EXISTS', `Студент уже существует (id=${found.id})`);
           } else {
             const studentPath = `${config.studentsPath}/${encodeURIComponent(found.id)}`;
-            const { data: current, etag } = await java('GET', studentPath, job.token, undefined, { withEtag: true });
+            const { data: current, etag } = await java('QUERY', studentPath, job.token, undefined, { withEtag: true });
             if (!etag) throw new Error('Java не вернул версию записи');
             if (fields.some((field) => current[field] !== found[field])) {
               return fail(line, 'CONFLICT', 'Студент изменился во время импорта');
             }
-            // update: оптимистичная проверка версии, если колонка есть в файле
+
             if (versionField && rec[versionField] && String(found[versionField]) !== rec[versionField]) {
               return fail(line, 'CONFLICT', `Запись изменена после экспорта (${versionField}: в файле ${rec[versionField]}, сейчас ${found[versionField]})`);
             }
@@ -190,10 +190,10 @@ export class Jobs {
           consecutiveNetErr = 0;
         } catch (e) {
           if (e.network) {
-            if (++consecutiveNetErr >= 5) throw e; // Java лежит — нет смысла продолжать
+            if (++consecutiveNetErr >= 5) throw e;
             return fail(line, 'NETWORK', e.message);
           }
-          if (e.status === 401 || e.status === 403) throw e; // нет прав — прекращаем всё задание
+          if (e.status === 401 || e.status === 403) throw e;
           fail(line, [404, 409, 412].includes(e.status) ? 'CONFLICT' : 'REJECTED', e.message);
         }
         this.#touch(job);
@@ -201,14 +201,14 @@ export class Jobs {
 
       const sink = new Writable({
         objectMode: true,
-        highWaterMark: 16, // backpressure: парсер ждёт, пока обрабатываются строки
+        highWaterMark: 16,
         write(row, _e, cb) { handle(row).then(() => cb(), cb); },
       });
       await pipeline(rs, new CsvParser({ delimiter: job.delimiter }), sink);
       p.percent = 100;
       job.state = 'done';
 
-      // Итог импорта — отдельная запись аудита (идемпотентна по id задания)
+
       await this.audit.append({
         eventId: `import-${job.id}`, action: 'STUDENT_IMPORT', entityId: job.id, occurredAt: new Date().toISOString(),
         actor: job.owner, after: { created: p.created, updated: p.updated, skipped: p.skipped, failed: p.failed, onConflict: job.onConflict },

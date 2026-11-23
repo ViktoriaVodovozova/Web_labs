@@ -23,7 +23,7 @@ th { background: #f6f8fc; font-size: 0.82rem; text-transform: uppercase; }
 .pagination { display: flex; gap: 12px; margin-top: 20px; padding-top: 18px; border-top: 1px solid #e1e7ef; }
 nav a { text-decoration: none; color: #35548e; font-weight: 500; margin-left: 15px; }
 
-/* Streaming SSR: placeholders are rendered while the students request is pending. */
+
 .students-count { margin: 14px 0; color: #53637b; }
 .students-skeleton { margin-top: 18px; }
 .skeleton-count { width: 150px; margin-bottom: 16px; }

@@ -13,6 +13,8 @@ import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
+import org.springframework.dao.PessimisticLockingFailureException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.io.IOException;
@@ -23,15 +25,15 @@ public class ErrorHandler {
     public static class ApiException extends RuntimeException {
         private final int status;
         private final Map<String, String> detail;
-    
+
         public ApiException(int status, String message) { this(status, message, Map.of("message", message)); }
-    
+
         public ApiException(int status, String message, Map<String, String> detail) {
             super(message);
             this.status = status;
             this.detail = Map.copyOf(detail);
         }
-    
+
         public int getStatus() { return status; }
         public Map<String, String> getDetail() { return detail; }
     }
@@ -54,6 +56,11 @@ public class ErrorHandler {
         MissingServletRequestParameterException.class})
     public ResponseEntity<Map<String, Object>> handleBadRequest(Exception e) {
         return error(400, "Некорректный формат запроса или параметров");
+    }
+
+    @ExceptionHandler({ObjectOptimisticLockingFailureException.class, PessimisticLockingFailureException.class})
+    public ResponseEntity<Map<String, Object>> handleConcurrentModification(Exception e) {
+        return error(409, "Конкурентное изменение записи. Обновите страницу и повторите действие");
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)

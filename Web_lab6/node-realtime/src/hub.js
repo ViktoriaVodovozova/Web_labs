@@ -1,6 +1,6 @@
 import crypto from 'node:crypto';
 
-// Формат сообщений: {v, type, id, replyTo?, ts, payload}
+
 export const msg = (type, payload = {}, replyTo) =>
   JSON.stringify({ v: 1, type, id: crypto.randomUUID(), ...(replyTo ? { replyTo } : {}), ts: new Date().toISOString(), payload });
 

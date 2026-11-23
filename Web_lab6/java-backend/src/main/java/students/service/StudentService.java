@@ -75,7 +75,10 @@ public class StudentService {
     @Transactional
     public StudentResponse replace(String id, StudentRequest request, String expectedTag) {
         Student student = findForUpdate(id);
-        if (expectedTag != null && !StudentResponse.fromStudent(student).etag().equals(expectedTag)) {
+        if (expectedTag == null || expectedTag.isBlank()) {
+            throw new ApiException(428, "Для изменения записи необходим заголовок If-Match (ETag из QUERY /api/requests/{id})");
+        }
+        if (!StudentResponse.fromStudent(student).etag().equals(expectedTag)) {
             throw new ApiException(412, "Студент изменился после чтения");
         }
         return replace(student, request);
@@ -95,8 +98,14 @@ public class StudentService {
     }
 
     @Transactional
-    public StudentResponse update(String id, StudentUpdateRequest request) {
+    public StudentResponse update(String id, StudentUpdateRequest request, String expectedTag) {
         Student student = findForUpdate(id);
+        if (expectedTag == null || expectedTag.isBlank()) {
+            throw new ApiException(428, "Для изменения записи необходим заголовок If-Match");
+        }
+        if (!StudentResponse.fromStudent(student).etag().equals(expectedTag)) {
+            throw new ApiException(412, "Студент изменился после чтения. Обновите страницу");
+        }
         StudentRequest merged = new StudentRequest(
             request.fullName() != null ? request.fullName() : student.fullName,
             request.group() != null ? request.group() : student.group,
@@ -119,11 +128,6 @@ public class StudentService {
         if (actor != null) notifier.sendEvent("STUDENT_DELETED", student.id, actor, StudentResponse.fromStudent(student), null);
     }
 
-    @Transactional
-    public StudentResponse restore(String id) {
-        Student student = students.findById(id).orElseThrow(() -> new ApiException(404, "Студент не найден"));
-        return StudentResponse.fromStudent(student);
-    }
 
     private Student findForUpdate(String id) {
         return students.findForUpdate(id).orElseThrow(() -> new ApiException(404, "Студент не найден"));

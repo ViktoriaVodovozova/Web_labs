@@ -12,7 +12,7 @@ const states = { queued: 'В очереди', running: 'Выполняется',
 const pageSize = 20;
 
 async function realtime(path, init) {
-  const response = await fetch('/rt' + path, { cache: 'no-store', ...init });
+  const response = await fetch('/rt' + path, { method: 'QUERY', cache: 'no-store', ...init });
   const data = await response.json();
   if (!response.ok) throw new Error(data.error || 'Ошибка сервиса');
   return data;

@@ -8,7 +8,7 @@ export class HttpError extends Error {
   }
 }
 
-// Вызов Java-backend от имени пользователя (его JWT) — права проверяет Java.
+
 export async function java(method, path, token, body, { ifMatch, withEtag = false } = {}) {
   let r;
   try {
@@ -20,7 +20,7 @@ export async function java(method, path, token, body, { ifMatch, withEtag = fals
     });
   } catch (e) {
     const err = new Error('Java-backend недоступен: ' + e.message);
-    err.network = true; // нет status => сетевая ошибка
+    err.network = true;
     throw err;
   }
   const text = await r.text();
@@ -32,7 +32,7 @@ export async function java(method, path, token, body, { ifMatch, withEtag = fals
 
 export async function fetchProfile(token) {
   try {
-    const p = await java('GET', config.profilePath, token);
+    const p = await java('QUERY', config.profilePath, token);
     return {
       id: p.id,
       username: p.username ?? p.login ?? p.email,
@@ -44,10 +44,10 @@ export async function fetchProfile(token) {
   }
 }
 
-// Постраничная выгрузка списка студентов
+
 export async function* students(token) {
   for (let page = 0; ; page++) {
-    const data = await java('GET', `${config.studentsPath}?page=${page}&size=${config.pageSize}&sortBy=id`, token);
+    const data = await java('QUERY', `${config.studentsPath}?page=${page}&size=${config.pageSize}&sortBy=id`, token);
     const items = Array.isArray(data) ? data : data?.content ?? [];
     yield { items, page };
     if (data?.last === true || items.length < config.pageSize) return;

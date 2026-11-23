@@ -5,7 +5,7 @@ import { HttpError } from './java.js';
 
 export const ACTIONS = new Set(['STUDENT_CREATED', 'STUDENT_UPDATED', 'STUDENT_DELETED', 'STUDENT_IMPORT']);
 
-// Журнал аудита: append-only JSON Lines. Переживает перезапуск; eventId делает приём идемпотентным.
+
 export class AuditLog {
   entries = [];
   byId = new Map();
@@ -66,7 +66,7 @@ export class AuditLog {
         meta: ev.meta ?? null,
       };
       await this.#fh.appendFile(JSON.stringify(entry) + '\n');
-      await this.#fh.datasync(); // запись на диск до подтверждения Java
+      await this.#fh.datasync();
       this.entries.push(entry);
       this.byId.set(entry.eventId, entry);
       return { duplicate: false, entry };
@@ -81,7 +81,7 @@ export class AuditLog {
     if (actorId != null && actorId !== '') r = r.filter((e) => String(e.actor.id) === String(actorId));
     if (entityId) r = r.filter((e) => e.entityId === String(entityId));
     if (afterSeq != null && afterSeq !== '') {
-      const items = r.filter((e) => e.seq > +afterSeq).slice(0, limit); // по возрастанию — для синхронизации
+      const items = r.filter((e) => e.seq > +afterSeq).slice(0, limit);
       return { total: items.length, items };
     }
     const total = r.length;

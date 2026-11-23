@@ -2,11 +2,11 @@ import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 
 async function fetchProfile(token) {
-  // ИСПРАВЛЕНО: теперь тоже используется java-backend
+
   const baseUrl = process.env.API_BASE_URL || 'http://java-backend:8000';
 
   const res = await fetch(`${baseUrl}/api/auth/me`, {
-    headers: { Authorization: `Bearer ${token}` },
+    method: 'QUERY', headers: { Authorization: `Bearer ${token}` },
     cache: 'no-store'
   });
   if (!res.ok) return null;

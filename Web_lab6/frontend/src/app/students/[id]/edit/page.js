@@ -4,21 +4,23 @@ import Link from 'next/link';
 import { updateStudentAction } from '../../actions';
 
 async function fetchStudent(id, token) {
-  // ИСПРАВЛЕНО: используем java-backend вместо localhost
+
   const baseUrl = process.env.API_BASE_URL || process.env.INTERNAL_API_URL || 'http://java-backend:8000';
 
   const res = await fetch(`${baseUrl}/api/requests/${encodeURIComponent(id)}`, {
-    headers: { Authorization: `Bearer ${token}` },
+    method: 'QUERY', headers: { Authorization: `Bearer ${token}` },
     cache: 'no-store'
   });
 
   if (!res.ok) return null;
 
+  const etag = res.headers.get('etag');
   const data = await res.json();
-  return Array.isArray(data) ? (data.length > 0 ? data[0] : null) : data;
+  const student = Array.isArray(data) ? (data.length > 0 ? data[0] : null) : data;
+  return student ? { ...student, etag } : null;
 }
 
-export default async function EditStudentPage({ params }) {
+export default async function EditStudentPage({ params, searchParams }) {
   const cookieStore = await cookies();
   const token = cookieStore.get('accessToken')?.value;
   if (!token) redirect('/login');
@@ -27,7 +29,7 @@ export default async function EditStudentPage({ params }) {
   const baseUrl = process.env.API_BASE_URL || process.env.INTERNAL_API_URL || 'http://java-backend:8000';
 
   const me = await fetch(`${baseUrl}/api/auth/me`, {
-    headers: { Authorization: `Bearer ${token}` },
+    method: 'QUERY', headers: { Authorization: `Bearer ${token}` },
     cache: 'no-store'
   });
 
@@ -37,10 +39,13 @@ export default async function EditStudentPage({ params }) {
   if (!student) return <div className="alert error">Студент не найден</div>;
 
   const updateActionWithId = updateStudentAction.bind(null, id);
+  const conflict = (await searchParams)?.conflict === '1';
 
   return (
     <section className="card narrow"><h2>Редактировать студента</h2>
+      {conflict && <p role="alert" className="alert error">Запись изменена другим пользователем. Загружена актуальная версия — проверьте данные перед сохранением.</p>}
       <form action={updateActionWithId} className="form-grid">
+        <input type="hidden" name="etag" value={student.etag || ''} />
         <div className="field"><label>ФИО *</label><input type="text" name="fullName" required defaultValue={student.fullName} maxLength={200} /></div>
         <div className="field"><label>Группа *</label><input type="text" name="group" required defaultValue={student.group} maxLength={100} /></div>
         <div className="field"><label>ИСУ ID *</label><input type="text" name="isuId" required defaultValue={student.isuId} pattern="[0-9]{6}" title="Ровно 6 цифр" /></div>

@@ -22,7 +22,7 @@ public class StudentController {
         this.service = service;
     }
 
-    @GetMapping
+    @RequestMapping
     public ResponseEntity<List<StudentResponse>> getAll(
         @RequestParam(required = false) String group,
         @RequestParam(required = false) Integer dormitory,
@@ -31,8 +31,10 @@ public class StudentController {
         @RequestParam(defaultValue = "0") int page,
         @RequestParam(defaultValue = "20") int size,
         @RequestParam(defaultValue = "fullName") String sortBy,
-        @RequestParam(defaultValue = "asc") String direction
+        @RequestParam(defaultValue = "asc") String direction,
+        jakarta.servlet.http.HttpServletRequest httpRequest
     ) {
+        if (!"QUERY".equals(httpRequest.getMethod())) throw new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.METHOD_NOT_ALLOWED);
         Page<StudentResponse> result = service.getAll(
             group, dormitory, isForeigner, search, page, size, sortBy, direction
         );
@@ -43,8 +45,9 @@ public class StudentController {
             .body(result.getContent());
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<StudentResponse> getById(@PathVariable String id) {
+    @RequestMapping("/{id}")
+    public ResponseEntity<StudentResponse> getById(@PathVariable String id, jakarta.servlet.http.HttpServletRequest httpRequest) {
+        if (!"QUERY".equals(httpRequest.getMethod())) throw new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.METHOD_NOT_ALLOWED);
         StudentResponse student = service.getById(id);
         return ResponseEntity.ok().eTag(student.etag()).body(student);
     }
@@ -61,8 +64,9 @@ public class StudentController {
     }
 
     @PatchMapping("/{id}")
-    public StudentResponse update(@PathVariable String id, @RequestBody StudentUpdateRequest request) {
-        return service.update(id, request);
+    public StudentResponse update(@PathVariable String id, @RequestBody StudentUpdateRequest request,
+                                  @RequestHeader(name = "If-Match", required = false) String expectedTag) {
+        return service.update(id, request, expectedTag);
     }
 
     @DeleteMapping("/{id}")
@@ -71,8 +75,4 @@ public class StudentController {
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/{id}/restore")
-    public StudentResponse restore(@PathVariable String id) {
-        return service.restore(id);
-    }
 }

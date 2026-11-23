@@ -7,7 +7,7 @@ async function fetchStudent(id, token) {
   const baseUrl = process.env.API_BASE_URL || process.env.INTERNAL_API_URL || 'http://java-backend:8000';
 
   const res = await fetch(`${baseUrl}/api/requests/${encodeURIComponent(id)}`, {
-    headers: { Authorization: `Bearer ${token}` },
+    method: 'QUERY', headers: { Authorization: `Bearer ${token}` },
     cache: 'no-store'
   });
 
@@ -25,7 +25,7 @@ export default async function StudentDetailPage({ params }) {
 
   const baseUrl = process.env.API_BASE_URL || process.env.INTERNAL_API_URL || 'http://java-backend:8000';
   const me = await fetch(`${baseUrl}/api/auth/me`, {
-    headers: { Authorization: `Bearer ${token}` },
+    method: 'QUERY', headers: { Authorization: `Bearer ${token}` },
     cache: 'no-store'
   });
 

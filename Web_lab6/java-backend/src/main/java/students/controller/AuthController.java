@@ -30,8 +30,9 @@ public class AuthController {
         return service.refresh(request);
     }
 
-    @GetMapping("/me")
-    public ProfileResponse me(java.security.Principal principal) {
+    @RequestMapping("/me")
+    public ProfileResponse me(java.security.Principal principal, jakarta.servlet.http.HttpServletRequest httpRequest) {
+        if (!"QUERY".equals(httpRequest.getMethod())) throw new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.METHOD_NOT_ALLOWED);
         if (principal == null) throw new ErrorHandler.ApiException(401, "Необходима авторизация");
         return service.profile(principal.getName());
     }

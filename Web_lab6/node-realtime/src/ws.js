@@ -1,10 +1,10 @@
-// Минимальная серверная реализация WebSocket (RFC 6455) на чистом Node.
+
 import crypto from 'node:crypto';
 import { EventEmitter } from 'node:events';
 
 const GUID = '258EAFA5-E914-47DA-95CA-C5AB0DC85B11';
-const MAX_PAYLOAD = 1 << 20; // 1 MiB на сообщение
-const MAX_BUFFERED = 1 << 20; // медленному клиенту не копим данные бесконечно
+const MAX_PAYLOAD = 1 << 20;
+const MAX_BUFFERED = 1 << 20;
 
 export class WSConnection extends EventEmitter {
   #buf = Buffer.alloc(0);
@@ -33,7 +33,7 @@ export class WSConnection extends EventEmitter {
     if (b.length < 2) return false;
     const fin = !!(b[0] & 0x80);
     const op = b[0] & 0x0f;
-    if (!(b[1] & 0x80)) return this.close(1002), false; // клиент обязан маскировать
+    if (!(b[1] & 0x80)) return this.close(1002), false;
     let len = b[1] & 0x7f;
     let off = 2;
     if (len === 126) {
@@ -56,7 +56,7 @@ export class WSConnection extends EventEmitter {
     this.#buf = b.subarray(off + 4 + len);
 
     if (op >= 0x8) {
-      // управляющие кадры
+
       if (!fin || len > 125) return this.close(1002), false;
       if (op === 0x8) return this.close(1000), false;
       if (op === 0x9) this.#write(0xa, payload);
@@ -79,7 +79,7 @@ export class WSConnection extends EventEmitter {
       this.#fragOp = 0;
       this.#frag = [];
       if (o === 1) this.emit('message', full.toString('utf8'));
-      else this.close(1003); // бинарные кадры протоколом не поддерживаются
+      else this.close(1003);
     }
     return true;
   }
@@ -104,7 +104,7 @@ export class WSConnection extends EventEmitter {
 
   send(text) {
     if (this.closed) return false;
-    if (this.socket.writableLength > MAX_BUFFERED) return this.close(1013), false; // backpressure
+    if (this.socket.writableLength > MAX_BUFFERED) return this.close(1013), false;
     this.#write(0x1, Buffer.from(text));
     return true;
   }

@@ -3,7 +3,7 @@ import { cookies } from 'next/headers';
 import { revalidatePath, updateTag } from 'next/cache';
 import { redirect } from 'next/navigation';
 
-// Функция для получения правильного URL (внутри Docker — java-backend)
+
 const getBaseUrl = () => process.env.API_BASE_URL || process.env.INTERNAL_API_URL || 'http://java-backend:8000';
 
 export async function createStudentAction(formData) {
@@ -41,10 +41,14 @@ export async function updateStudentAction(id, formData) {
     notes: formData.get('notes') || ''
   };
 
-  // ИСПОЛЬЗУЕМ getBaseUrl() ВМЕСТО localhost
+
   const res = await fetch(`${getBaseUrl()}/api/requests/${id}`, {
-    method: 'PUT', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify(data)
+    method: 'PUT', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}`, 'If-Match': String(formData.get('etag') || '') }, body: JSON.stringify(data)
   });
+
+  if (res.status === 412 || res.status === 409) {
+    redirect(`/students/${id}/edit?conflict=1`);
+  }
 
   if (!res.ok) {
     const errorText = await res.text();
@@ -76,7 +80,7 @@ export async function refreshStudentCache() {
   const token = (await cookies()).get('accessToken')?.value;
   if (!token) return;
   const response = await fetch(`${getBaseUrl()}/api/auth/me`, {
-    headers: { Authorization: `Bearer ${token}` },
+    method: 'QUERY', headers: { Authorization: `Bearer ${token}` },
     cache: 'no-store',
   });
   if (response.ok && (await response.json()).role === 'ADMIN') updateTag('students');

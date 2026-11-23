@@ -24,6 +24,4 @@ public class Student {
     public boolean isForeigner;
     @Column(nullable = false, length = 5000)
     public String notes = "";
-    @Column(nullable = false, columnDefinition = "boolean default false")
-    public boolean deleted = false;
 }

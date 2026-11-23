@@ -1,4 +1,4 @@
-// Displayed immediately while the students API request is pending.
+
 export default function StudentsSkeleton() {
   return (
     <div className="students-skeleton" role="status" aria-label="Загрузка списка студентов" aria-busy="true">
