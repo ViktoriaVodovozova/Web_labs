@@ -4,10 +4,19 @@ import { HttpError, fetchProfile } from './java.js';
 
 export const bearer = (req) => {
   const h = req.headers.authorization || '';
+
   if (h.startsWith('Bearer ')) return h.slice(7);
-  if (req.method !== 'QUERY' && !config.allowedOrigins.includes(req.headers.origin)) return null;
-  const cookie = req.headers.cookie?.split(';').map((part) => part.trim())
+
+  if (
+    req.method !== 'QUERY' &&
+    req.method !== 'GET' &&
+    !config.allowedOrigins.includes(req.headers.origin)
+  ) return null;
+
+  const cookie = req.headers.cookie?.split(';')
+    .map((part) => part.trim())
     .find((part) => part.startsWith('accessToken='));
+
   return cookie?.slice('accessToken='.length) || null;
 };
 

@@ -8,6 +8,11 @@ public class Student {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     public String id;
+
+    @Version
+    @Column(name = "version")
+    public Long version;
+
     @Column(name = "full_name", nullable = false, length = 200)
     public String fullName;
     @Column(name = "student_group", nullable = false, length = 100)

@@ -44,7 +44,6 @@ async function route(req, res) {
 
   if (m === 'QUERY' && p === '/health') return json(res, 200, { ok: true, auditEntries: audit.entries.length });
 
-
   if (m === 'POST' && p === '/internal/events') {
     checkServiceKey(req);
     const ev = await readJson(req);
@@ -53,12 +52,10 @@ async function route(req, res) {
     return json(res, 200, { ok: true, duplicate: r.duplicate, seq: r.entry.seq });
   }
 
-
   if (m === 'POST' && p === '/ticket') {
     const { user, token } = await authenticate(req);
     return json(res, 200, { ticket: issueTicket(user, token), expiresInSec: config.ticketTtlMs / 1000, user });
   }
-
 
   if (m === 'QUERY' && p === '/audit') {
     const { user } = await authenticate(req);
@@ -66,14 +63,12 @@ async function route(req, res) {
     return json(res, 200, audit.query(q));
   }
 
-
   if (m === 'POST' && p === '/export') {
     const { user, token } = await authenticate(req);
     requireRole(user, config.importExportRoles);
     const job = jobs.startExport(user, token, delim(q.delimiter));
     return json(res, 202, { jobId: job.id });
   }
-
 
   if (m === 'POST' && p === '/import') {
     const { user, token } = await authenticate(req);
@@ -100,14 +95,24 @@ async function route(req, res) {
     return json(res, 202, { jobId: id });
   }
 
+  const match = p.match(/^\/jobs\/([\w-]+)(\/file)?$/);
 
-  const mj = p.match(/^\/jobs\/([\w-]+)(\/file)?$/);
-  if (m === 'QUERY' && mj) {
+  if (match && (m === 'QUERY' || (m === 'GET' && match[2]))) {
+    const [, id, file] = match;
     const { user } = await authenticate(req);
-    const job = jobs.get(mj[1]);
-    if (!job || (String(job.owner.id) !== String(user.id) && user.role !== 'ADMIN')) throw new HttpError(404, 'Задание не найдено');
-    if (!mj[2]) return json(res, 200, jobs.snapshot(job));
+    const job = jobs.get(id);
+
+    if (!job) throw new HttpError(404, 'Задание не найдено');
+
+    const isOwner = String(job.owner.id) === String(user.id);
+    const isAdmin = user.role === 'ADMIN';
+
+    if (!isOwner && !isAdmin) throw new HttpError(404, 'Задание не найдено');
+
+    if (!file) return json(res, 200, jobs.snapshot(job));
+
     if (job.type !== 'export' || job.state !== 'done') throw new HttpError(409, 'Файл ещё не готов');
+
     res.writeHead(200, {
       'Content-Type': 'text/csv; charset=utf-8',
       'Content-Disposition': `attachment; filename="students-${job.id.slice(0, 8)}.csv"`,
@@ -127,7 +132,6 @@ const server = http.createServer((req, res) => {
     json(res, 500, { error: 'Внутренняя ошибка' });
   });
 });
-
 
 server.on('upgrade', (req, socket) => {
   const url = new URL(req.url, 'http://x');
@@ -172,7 +176,6 @@ server.on('upgrade', (req, socket) => {
     }
   });
 });
-
 
 setInterval(() => {
   for (const c of hub.clients) {

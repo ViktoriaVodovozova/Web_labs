@@ -36,7 +36,7 @@ export async function fetchProfile(token) {
     return {
       id: p.id,
       username: p.username ?? p.login ?? p.email,
-      role: String(p.role ?? p.roles?.[0]?.name ?? p.roles?.[0] ?? '').replace(/^ROLE_/, ''),
+      role: p.role,
     };
   } catch (e) {
     if (e.status === 401 || e.status === 403) return null;
@@ -47,9 +47,12 @@ export async function fetchProfile(token) {
 
 export async function* students(token) {
   for (let page = 0; ; page++) {
-    const data = await java('QUERY', `${config.studentsPath}?page=${page}&size=${config.pageSize}&sortBy=id`, token);
-    const items = Array.isArray(data) ? data : data?.content ?? [];
+    const items = await java(
+      'QUERY',
+      `${config.studentsPath}?page=${page}&size=${config.pageSize}&sortBy=id`,
+      token
+    );
     yield { items, page };
-    if (data?.last === true || items.length < config.pageSize) return;
+    if (items.length < config.pageSize) return;
   }
 }

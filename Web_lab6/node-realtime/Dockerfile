@@ -1,4 +1,3 @@
-# Этап 1: Сборка (Maven)
 FROM node:22-alpine
 WORKDIR /app
 
